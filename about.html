@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>About Us — Kira's Bloom Craft</title>
+
+<!-- Google Fonts -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+<style>
+:root {
+  --peach-light: #FFCBA4;
+  --peach-medium: #FF9F7A;
+  --peach-dark: #FF8C69;
+  --peach-accent: #FF6B4A;
+  --text-dark: #2C1810;
+  --text-medium: #4A3426;
+  --bg-cream: #FFF9F5;
+  --white: #FFFFFF;
+  --shadow-sm: 0 2px 8px rgba(255, 156, 122, 0.15);
+  --shadow-md: 0 4px 16px rgba(255, 156, 122, 0.2);
+  --shadow-lg: 0 8px 32px rgba(255, 156, 122, 0.25);
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  font-family: 'Poppins', sans-serif;
+  background: var(--bg-cream);
+  color: var(--text-dark);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Navbar */
+.navbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: rgba(255,255,255,0.95);
+  padding: 1rem 2rem;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  box-shadow: var(--shadow-sm);
+  backdrop-filter: blur(10px);
+  border-bottom: 2px solid var(--peach-accent);
+}
+.navbar h1 {
+  font-size: 1.8rem;
+  font-weight: 800;
+  background: linear-gradient(135deg, var(--peach-dark), var(--peach-accent));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  cursor: pointer;
+}
+.navbar ul {
+  display: flex;
+  list-style: none;
+  gap: 0.5rem;
+  align-items: center;
+}
+.navbar ul li a {
+  text-decoration: none;
+  color: var(--text-medium);
+  font-weight: 500;
+  padding: 0.6rem 1.2rem;
+  border-radius: 25px;
+  transition: all 0.3s ease;
+}
+.navbar ul li a:hover {
+  color: #fff;
+  background: linear-gradient(135deg, var(--peach-light), var(--peach-medium));
+}
+.navbar ul li a.active {
+  background: linear-gradient(135deg, var(--peach-medium), var(--peach-dark));
+  color: #fff;
+  font-weight: 600;
+  box-shadow: var(--shadow-sm);
+}
+
+/* Main content */
+main.about-main {
+  flex: 1;
+  max-width: 1200px;
+  margin: 2rem auto;
+  padding: 0 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 2.5rem;
+}
+
+.about-section {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 2rem;
+  background: var(--white);
+  padding: 2rem;
+  border-radius: 20px;
+  box-shadow: var(--shadow-md);
+  flex-wrap: wrap;
+  transition: transform 0.3s, box-shadow 0.3s;
+}
+.about-section:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-lg);
+}
+.about-text { flex: 1; }
+.about-text h2 {
+  font-size: 1.8rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+  color: var(--peach-accent);
+}
+.about-text p, .about-text li { color: var(--text-medium); margin-bottom: 0.5rem; }
+.about-text ul { padding-left: 1.2rem; margin-bottom: 1rem; }
+.about-img { flex: 1; display: flex; justify-content: flex-end; }
+.about-img img {
+  max-width: 100%;
+  border-radius: 12px;
+  box-shadow: var(--shadow-sm);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .about-section { flex-direction: column; text-align: center; }
+  .about-img { justify-content: center; }
+}
+
+/* Footer */
+footer {
+  text-align: center;
+  padding: 2rem;
+  background: var(--white);
+  color: var(--text-medium);
+  font-weight: 600;
+  border-top: 1px solid rgba(255,159,122,0.2);
+  margin-top: auto;
+}
+</style>
+</head>
+<body>
+
+<!-- Navbar -->
+<nav class="navbar">
+  <h1>Kira's Bloom Craft</h1>
+  <ul>
+    <li><a href="index.html">Home</a></li>
+    <li><a href="menu.html">Shop</a></li>
+    <li><a href="cart.html">Cart <span id="cartBadge">0</span></a></li>
+    <li><a href="reviews.html">Reviews</a></li>
+    <li><a href="about.html" class="active">About</a></li>
+    <li><a href="termsandcondition.html">Terms & Conditions</a></li>
+    <li><a href="tracking.html">Order Tracking</a></li>
+    <li><a href="customerservice.html">Customer Service</a></li>
+    <li><a href="#" id="logoutLink">Logout</a></li>
+  </ul>
+</nav>
+
+<!-- About content -->
+<main class="about-main">
+  <section class="about-section">
+    <div class="about-text">
+      <h2>Our Story</h2>
+      <p>Welcome to <strong>Kira's Bloom Craft</strong> — handcrafted floral arrangements bringing joy, beauty, and meaning to every occasion.</p>
+      <p>Founded with passion, we aim to make every bloom tell a story. Perfect for celebrations, gifts, or brightening someone's day.</p>
+    </div>
+    <div class="about-img">
+      <img src="images/about-flowers.jpg" alt="Handcrafted flower arrangements">
+    </div>
+  </section>
+
+  <section class="about-section">
+    <div class="about-text">
+      <h2>What We Sell</h2>
+      <ul>
+        <li>Classic bouquets: Rosé Kiss, Crimson Grace, Purple Kiss.</li>
+        <li>Mini Daisies in playful colors: Blush, Sunshine, Purple, Mint.</li>
+        <li>Elegant pieces: Rapunzel’s Flower, Sapphire Skies, Blush Bouquet.</li>
+        <li>Seasonal bestsellers: Garden, Sunrise, Ocean Bloom.</li>
+      </ul>
+    </div>
+    <div class="about-img">
+      <img src="images/about-bouquet.jpg" alt="Beautiful bouquet arrangements">
+    </div>
+  </section>
+
+  <!-- NEW SECTION ADDED HERE -->
+  <section class="about-section">
+    <div class="about-text">
+      <h2>Our Materials & Suppliers</h2>
+      <p>We partner with reliable suppliers from Shopee to ensure product quality. Each material we use is carefully chosen to reflect our dedication to craftsmanship, beauty, and sustainability.</p>
+      <p>Our raw materials — from silk and foam flowers to ribbons, wrappers, and vases — are sourced from trusted local and online vendors who share our passion for excellence. This helps us maintain high standards for color vibrancy, texture, and longevity.</p>
+      <p>We take pride in responsibly sourcing every material used in our floral designs. By working with small and ethical suppliers, we help support local communities while ensuring that every Kira’s Bloom Craft creation brings lasting delight.</p>
+    </div>
+    <div class="about-img">
+      <img src="images/about-materials.jpg" alt="Flower crafting materials and supplies">
+    </div>
+  </section>
+  <!-- END NEW SECTION -->
+
+  <section class="about-section">
+    <div class="about-text">
+      <h2>Our Mission</h2>
+      <p>We believe flowers are more than gifts — they are expressions of emotion. We deliver happiness with every bloom. 💐</p>
+    </div>
+  </section>
+
+  <section class="about-section">
+    <div class="about-text">
+      <h2>Contact Us</h2>
+      <ul>
+        <li>📧 <a href="mailto:kirabloomcraft@gmail.com" style="color:#FF6B4A; text-decoration:none;">kirabloomcraft@gmail.com</a></li>
+        <li>📘 <a href="https://www.facebook.com/profile.php?id=61580234325780" target="_blank" style="color:#FF6B4A; text-decoration:none;">facebook.com/kirabloomcraft</a></li>
+        <li>📸 <a href="https://www.instagram.com/invites/contact/?i=1ezd5l4go9qx2&utm_content=zchp18c" target="_blank" style="color:#FF6B4A; text-decoration:none;">instagram.com/kirabloomcraft</a></li>
+      </ul>
+    </div>
+    <div class="about-img" style="justify-content:center; font-size:4rem;">💐</div>
+  </section>
+</main>
+
+<footer>
+  &copy; 2025 Kira's Bloom Craft. All Rights Reserved.
+</footer>
+
+<script>
+  // Update cart badge
+  const cartBadge = document.getElementById('cartBadge');
+  let cart = JSON.parse(localStorage.getItem('cart')) || [];
+  cartBadge.textContent = cart.reduce((sum,item)=>sum+(item.qty||0),0);
+
+  // Active navbar link
+  const navbarLinks = document.querySelectorAll('.navbar ul li a');
+  const currentPage = window.location.pathname.split("/").pop();
+  navbarLinks.forEach(link => {
+    if(link.getAttribute('href') === currentPage){ link.classList.add('active'); }
+  });
+
+  // Logout
+  document.getElementById('logoutLink').addEventListener('click', e=>{
+    e.preventDefault();
+    localStorage.clear();
+    alert('✅ You have been logged out.');
+    window.location.href='login.html';
+  });
+</script>
+
+</body>
+</html>

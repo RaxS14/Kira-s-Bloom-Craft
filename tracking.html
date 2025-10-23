@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Order Tracking — Kira's Bloom Craft</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+<style>
+  body { font-family:'Poppins',sans-serif; margin:0; padding:0; background:#fff8f5; display:flex; flex-direction:column; min-height:100vh; }
+  main { flex:1; padding:2rem; }
+  .navbar { background:#fff; padding:1rem 2rem; display:flex; flex-wrap:wrap; justify-content:space-between; align-items:center; box-shadow:0 4px 10px rgba(0,0,0,0.1); position:sticky; top:0; z-index:1000; border-bottom:2px solid #FF6B81; }
+  .navbar h1 { font-size:1.8rem; font-weight:800; background:linear-gradient(135deg,#FF8C69,#FF6B4A); -webkit-background-clip:text; -webkit-text-fill-color:transparent; cursor:pointer; }
+  .navbar ul { display:flex; list-style:none; gap:0.8rem; margin:0; padding:0; flex-wrap:wrap; }
+  .navbar ul li a { text-decoration:none; color:#4A3426; font-weight:500; padding:0.6rem 1.2rem; border-radius:50px; transition:all 0.3s; }
+  .navbar ul li a:hover, .navbar ul li a.active { background:linear-gradient(135deg,#FF9F7A,#FF8C69); color:#fff; }
+  .about-hero { background:#fff0f0; padding:2rem; text-align:center; border-radius:12px; margin:1rem 2rem; box-shadow:0 4px 10px rgba(0,0,0,0.05); }
+  .about-hero h2 { color:#FF6B81; font-size:2rem; margin-bottom:0.5rem; }
+  .about-hero p { color:#FF4757; font-size:1.1rem; }
+  .status-section { max-width:700px; width:100%; margin:2rem auto; background:#fff8f5; padding:1.5rem; border-radius:12px; box-shadow:0 4px 10px rgba(0,0,0,0.1); }
+  .status-steps { display:flex; flex-direction:column; gap:0.8rem; margin-top:1rem; }
+  .status-steps .step { padding:0.5rem 1rem; border-radius:8px; background:#ffe6e0; font-weight:bold; opacity:0.5; transform:translateX(-10px); transition:all 0.5s ease; }
+  .status-steps .completed { background:#ffb6b9; color:#fff; opacity:1; transform:translateX(0); }
+  .status-steps .active { background:#ff6b81; color:#fff; opacity:1; transform:translateX(0); }
+  .prev-order { cursor:pointer; padding:10px; border:1px solid #ddd; margin-bottom:8px; border-radius:5px; transition:background 0.2s; background:#fff; position:relative; }
+  .prev-order:hover { background:#f9f9f9; }
+  .remove-order, .cancel-order { cursor:pointer; background:#e74c3c; color:white; border:none; padding:5px 10px; border-radius:6px; font-weight:bold; position:absolute; top:10px; right:10px; }
+  .remove-order:hover, .cancel-order:hover { background:#c0392b; }
+  .receipt img { max-width:120px; margin:5px 5px 5px 0; border:1px solid #ccc; border-radius:6px; cursor:pointer; transition:transform 0.2s; display:inline-block; }
+  .receipt img:hover { transform:scale(1.05); }
+  .status-badge { display:inline-block; padding:3px 8px; border-radius:12px; font-weight:bold; font-size:0.9rem; }
+  .pending { background:#FFA500; color:#000; }
+  .confirmed { background:#FF6B81; color:#fff; }
+  .prepared { background:#FF8C69; color:#fff; }
+  .delivery { background:#FF4757; color:#fff; }
+  .delivered { background:#2d7a2d; color:#fff; }
+  .cancelled { background:#e74c3c; color:#fff; }
+  footer { text-align:center; padding:1rem; font-weight:bold; color:#FF6B81; background:#fff8f5; }
+  #statusNotification { position:fixed; top:-60px; left:50%; transform:translateX(-50%); background:#ff6b81; color:#fff; padding:12px 20px; border-radius:8px; font-weight:bold; box-shadow:0 4px 10px rgba(0,0,0,0.2); z-index:2000; transition:top 0.5s ease, opacity 0.5s ease; opacity:0; }
+  #statusNotification.show { top:20px; opacity:1; }
+</style>
+</head>
+<body>
+
+<nav class="navbar">
+  <h1>Kira's Bloom Craft</h1>
+  <ul>
+    <li><a href="index.html">Home</a></li>
+    <li><a href="menu.html">Shop</a></li>
+    <li><a href="cart.html">Cart <span id="cartBadge">0</span></a></li>
+    <li><a href="reviews.html">Reviews</a></li>
+    <li><a href="about.html">About</a></li>
+    <li><a href="termsandcondition.html">Terms & Conditions</a></li>
+    <li><a href="tracking.html" class="active">Order Tracking</a></li>
+    <li><a href="customerservice.html">Customer Service</a></li>
+  </ul>
+</nav>
+
+<header class="about-hero">
+  <h2>Track Your Order</h2>
+  <p>Follow your flowers on their journey 🌸</p>
+</header>
+
+<main>
+  <section class="status-section">
+    <h2>Order Details</h2>
+    <div id="orderDetails"><p>Loading your order...</p></div>
+
+    <div style="margin-top:1rem;">
+      <button id="deliveryTrackingBtn" style="padding:0.5rem 1rem;background:#FF4757;color:#fff;border:none;border-radius:6px;cursor:pointer;font-weight:bold;">🚚 Delivery Tracking</button>
+    </div>
+
+    <h2>Order Status</h2>
+    <div class="status-steps">
+      <div class="step" id="step1">✅ Order Confirmed</div>
+      <div class="step" id="step2">🌸 Being Prepared</div>
+      <div class="step" id="step3">🚚 Out for Delivery</div>
+      <div class="step" id="step4">📍 Delivered</div>
+    </div>
+
+    <h2>Previous Orders</h2>
+    <div id="previousOrders"><p>Loading previous orders...</p></div>
+  </section>
+</main>
+
+<footer>&copy; 2025 Kira's Bloom Craft. All Rights Reserved.</footer>
+<div id="statusNotification"></div>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  const orderDetails = document.getElementById("orderDetails");
+  const previousOrdersDiv = document.getElementById("previousOrders");
+  const notifDiv = document.getElementById("statusNotification");
+
+  let orders = JSON.parse(localStorage.getItem("orders")) || [];
+  let previousStatuses = {};
+  orders.forEach(o => previousStatuses[o.id] = o.status);
+
+  let orderId = new URLSearchParams(window.location.search).get("id") || localStorage.getItem("lastOrderId") || (orders.length ? orders[orders.length-1].id : null);
+  if(!orderId && orders.length) { orderId = orders[orders.length-1].id; localStorage.setItem("lastOrderId", orderId); }
+
+  const statusClassMap = {
+    "Pending Confirmation":"pending",
+    "Order Confirmed":"confirmed",
+    "Being Prepared":"prepared",
+    "Out for Delivery":"delivery",
+    "Delivered":"delivered",
+    "Cancelled":"cancelled"
+  };
+
+  function highlightSteps(status, container){
+    const map = { "Order Confirmed":[1], "Being Prepared":[1,2], "Out for Delivery":[1,2,3], "Delivered":[1,2,3,4], "Cancelled":[] };
+    const steps = container.querySelectorAll(".step");
+    steps.forEach(s=>s.classList.remove("completed","active"));
+    if(!status || status==="Pending Confirmation") return;
+    map[status].forEach((num,idx)=>{
+      const el = container.querySelector(`#step${num}`);
+      if(el) idx < map[status].length-1 ? el.classList.add("completed") : el.classList.add("active");
+    });
+  }
+
+  function createOrderHTML(order){
+    const itemsHtml = order.items.map(i=>`<li>${i.qty} × ${i.name} — ₱${(i.price*i.qty).toFixed(2)}</li>`).join("");
+    const receiptsHtml = (order.receipts||[]).map(r=>`<img src="${r}" alt="Receipt">`).join("");
+    const statusBadge = `<span class="status-badge ${statusClassMap[order.status] || ''}">${order.status}</span>`;
+    return `<div class="order-block" data-id="${order.id}">
+      <p><strong>Order ID:</strong> ${order.id}</p>
+      <p><strong>Name:</strong> ${order.buyerName || 'N/A'}</p>
+      <p><strong>Contact:</strong> ${order.buyerContact || 'N/A'}</p>
+      <p><strong>Placed On:</strong> ${order.createdAt}</p>
+      <p><strong>Status:</strong> ${statusBadge}</p>
+      <h3>Items:</h3><ul>${itemsHtml}</ul>
+      ${receiptsHtml ? `<div class="receipt"><strong>Receipt(s):</strong><br>${receiptsHtml}</div>` : ""}
+    </div>`;
+  }
+
+  function addCancelButton(orderBlock, order){
+    if(["Delivered","Cancelled"].includes(order.status)) return;
+    const btn = document.createElement("button");
+    btn.textContent = "❌ Cancel Order";
+    btn.className = "cancel-order";
+    orderBlock.appendChild(btn);
+    btn.addEventListener("click", ()=>{
+      if(confirm(`Are you sure you want to cancel Order ${order.id}?`)){
+        order.status="Cancelled";
+        localStorage.setItem("orders",JSON.stringify(orders));
+        renderAllOrders();
+        renderPreviousOrders();
+        showNotification(`Order ${order.id} has been cancelled`);
+      }
+    });
+  }
+
+  function renderAllOrders(){
+    if(orders.length===0){ orderDetails.innerHTML="<p>No orders found 😢</p>"; return; }
+    orderDetails.innerHTML = orders.map(createOrderHTML).join("");
+    const lastOrder = orders.find(o=>o.id==orderId);
+    if(lastOrder){
+      const lastBlock = orderDetails.querySelector(`.order-block[data-id="${lastOrder.id}"]`);
+      highlightSteps(lastOrder.status, lastBlock || document);
+      addCancelButton(lastBlock, lastOrder);
+    }
+  }
+
+  function renderPreviousOrders(){
+    const prevOrders = orders.filter(o=>o.id!=orderId);
+    if(prevOrders.length===0){ previousOrdersDiv.innerHTML="<p>No previous orders.</p>"; return; }
+    previousOrdersDiv.innerHTML = prevOrders.map(o=>{
+      const items = o.items.map(i=>`${i.qty} × ${i.name} — ₱${(i.price*i.qty).toFixed(2)}`).join("<br>");
+      const receiptsHtml = (o.receipts||[]).map(r=>`<img src="${r}" alt="Receipt">`).join("");
+      const statusBadge = `<span class="status-badge ${statusClassMap[o.status] || ''}">${o.status}</span>`;
+      return `<div class="prev-order" data-id="${o.id}">
+        <button class="remove-order" data-remove="${o.id}">Remove</button>
+        <p><strong>Order ID:</strong> ${o.id}</p>
+        <p><strong>Name:</strong> ${o.buyerName || 'N/A'}</p>
+        <p><strong>Contact:</strong> ${o.buyerContact || 'N/A'}</p>
+        <p><strong>Placed On:</strong> ${o.createdAt}</p>
+        <p><strong>Status:</strong> ${statusBadge}</p>
+        <p><strong>Items:</strong><br>${items}</p>
+        ${receiptsHtml ? `<div class="receipt"><strong>Receipt(s):</strong><br>${receiptsHtml}</div>` : ""}
+      </div>`;
+    }).join("");
+
+    document.querySelectorAll(".prev-order").forEach(el=>{
+      el.addEventListener("click", e=>{
+        if(e.target.classList.contains("remove-order")) return;
+        const selectedOrder = orders.find(o=>o.id==el.dataset.id);
+        if(selectedOrder){
+          orderId = el.dataset.id;
+          localStorage.setItem("lastOrderId", orderId);
+          renderAllOrders();
+          window.scrollTo({top:0,behavior:'smooth'});
+        }
+      });
+    });
+
+    document.querySelectorAll(".remove-order").forEach(btn=>{
+      btn.addEventListener("click", e=>{
+        e.stopPropagation();
+        orders = orders.filter(o=>o.id!=btn.dataset.remove);
+        localStorage.setItem("orders",JSON.stringify(orders));
+        renderAllOrders();
+        renderPreviousOrders();
+      });
+    });
+  }
+
+  function showNotification(msg){
+    notifDiv.textContent = msg;
+    notifDiv.classList.add("show");
+    setTimeout(()=>notifDiv.classList.remove("show"),4000);
+  }
+
+  renderAllOrders();
+  renderPreviousOrders();
+
+  window.addEventListener("storage", e=>{
+    if(e.key==="orders"){
+      const newOrders = JSON.parse(localStorage.getItem("orders")) || [];
+      newOrders.forEach(o=>{
+        if(previousStatuses[o.id] && previousStatuses[o.id]!==o.status) showNotification(`Order ${o.id} is now "${o.status}"`);
+        previousStatuses[o.id] = o.status;
+      });
+      orders=newOrders;
+      renderAllOrders();
+      renderPreviousOrders();
+    }
+  });
+
+  const deliveryBtn = document.getElementById("deliveryTrackingBtn");
+  deliveryBtn?.addEventListener("click", ()=>{
+    if(orderId) window.location.href = `delivery-tracker.html?id=${orderId}`;
+    else alert("No order selected for delivery tracking.");
+  });
+});
+</script>
+
+</body>
+</html>

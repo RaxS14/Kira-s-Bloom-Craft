@@ -1,0 +1,13 @@
+<div class="product-card">
+  <img src="images/pastel-petals.jpg" alt="Pastel Petals">
+  <div class="product-info">
+    <h2>Pastel Petals</h2>
+    <p>₱500.00</p>
+    <button class="add-to-cart-btn"
+            data-name="Pastel Petals"
+            data-price="500"
+            data-img="pastel-petals.jpg">
+      Add to Cart
+    </button>
+  </div>
+</div>

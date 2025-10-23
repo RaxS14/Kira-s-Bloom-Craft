@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kira's Bloom Craft — Home</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    body { margin:0; font-family:'Poppins',sans-serif; background:#fff8f5; }
+
+    /* ===== Navbar ===== */
+    .navbar {
+      background:rgba(255,255,255,0.95); padding:1rem 2rem;
+      box-shadow:0 2px 8px rgba(0,0,0,0.1); position:sticky; top:0; z-index:1000; backdrop-filter:blur(10px);
+    }
+    .navbar h1 {
+      font-size:1.8rem; font-weight:800;
+      background:linear-gradient(135deg,#FF8C69,#FF6B4A);
+      -webkit-background-clip:text; -webkit-text-fill-color:transparent;
+    }
+    .navbar ul { display:flex; list-style:none; gap:0.5rem; flex-wrap:wrap; }
+    .navbar ul li a {
+      text-decoration:none; color:#4A3426; font-weight:500; padding:0.6rem 1.2rem; border-radius:25px; transition:all 0.3s;
+    }
+    .navbar ul li a.active {
+      background:linear-gradient(135deg,#FF9F7A,#FF8C69);
+      color:#fff; font-weight:600; box-shadow:0 2px 8px rgba(255,156,122,0.15);
+    }
+
+    /* ===== Hero ===== */
+    .hero { display:flex; justify-content:space-between; align-items:center; padding:2rem; }
+    .hero-content { max-width:50%; }
+    .hero-content h1 { font-size:2rem; color:#FF6B4A; margin-bottom:1rem; }
+    .hero-content p { margin-bottom:1.5rem; color:#4A3426; }
+    .hero-btn { background:#FF6B81; color:#fff; padding:0.8rem 1.5rem; border-radius:50px; text-decoration:none; font-weight:bold; }
+    .hero-img { max-width:20%; border-radius:12px; }
+
+    /* ===== Shop Container ===== */
+    .shop-container { display:flex; gap:1.5rem; flex-wrap:wrap; justify-content:center; padding:2rem; }
+    .product-card { background:#fff8f5; border-radius:12px; box-shadow:0 4px 10px rgba(0,0,0,0.1); width:220px; text-align:center; padding:1rem; }
+    .product-card img { width:100%; border-radius:12px; }
+    .product-info h2 { margin:0.5rem 0; font-size:1.1rem; }
+    .product-info p { color:#ff6b81; font-weight:bold; margin-bottom:0.5rem; }
+    .add-to-cart-btn { background:#ff6b81; color:#fff; border:none; padding:0.5rem 1rem; border-radius:50px; cursor:pointer; font-weight:bold; transition: background 0.3s; }
+    .add-to-cart-btn:hover { background:#ff4757; }
+
+    /* ===== Reviews Section ===== */
+    #reviewsSection { max-width:1200px; margin:2rem auto; padding:0 2rem; }
+    #reviewsSection h2 { text-align:center; color:#FF6B4A; margin-bottom:2rem; }
+    .review-feed { display:flex; flex-direction:column; gap:1.5rem; }
+    .review-card {
+      background:#fff8f5; border-radius:12px; padding:1.5rem;
+      box-shadow:0 4px 12px rgba(255,156,122,0.2);
+      border:1px solid rgba(255,159,122,0.2);
+      display:flex; gap:1rem; align-items:flex-start;
+    }
+    .review-emoji { font-size:2.5rem; }
+    .review-content { flex:1; }
+    .review-name { font-weight:700; color:#FF6B4A; margin-bottom:0.3rem; }
+    .review-stars { color:#FF8C69; font-size:1.1rem; margin-bottom:0.5rem; }
+    .review-message { color:#4A3426; }
+
+    /* ===== Footer ===== */
+    footer { background:#fff8f5; text-align:center; padding:1rem; font-weight:bold; color:#ff6b81; margin-top:2rem; }
+  </style>
+</head>
+<body>
+
+  <!-- Navbar -->
+  <nav class="navbar">
+    <h1>Kira's Bloom Craft</h1>
+    <ul>
+      <li><a href="index.html" class="active">Home</a></li>
+      <li><a href="menu.html">Shop</a></li>
+      <li><a href="cart.html">Cart <span id="cartBadge">0</span></a></li>
+      <li><a href="reviews.html">Reviews</a></li>
+      <li><a href="about.html">About</a></li>
+      <li><a href="termsandcondition.html">Terms & Conditions</a></li>
+      <li><a href="tracking.html">Order Tracking</a></li>
+      <li><a href="#" id="logoutLink">Logout</a></li>
+    </ul>
+    <div class="nav-search">
+      <input type="text" id="searchBar" placeholder="🔍 Search products...">
+    </div>
+  </nav>
+
+  <!-- Hero Section -->
+  <section class="hero">
+    <div class="hero-content">
+      <h1>Welcome to Kira's Bloom Craft</h1>
+      <p>Discover beautiful flower arrangements for every occasion. Fresh, vibrant, and delivered with love.</p>
+      <p style="font-size:1.2rem; color:#4A3426; margin-bottom:1.5rem;">
+        🌸 At Kira's Bloom Craft, we create hand-crafted artificial bouquets with love and attention to detail. Perfect for gifts, home décor, or special occasions.
+      </p>
+      <a href="menu.html" class="hero-btn">Shop Now</a>
+    </div>
+    <img src="images/hero-flower.jpg" alt="Beautiful flowers" class="hero-img">
+  </section>
+
+  <!-- Sales Section -->
+  <section class="shop-container">
+    <div style="width:100%; text-align:center; margin-bottom:1.5rem;">
+      <h2 style="font-size:1.5rem; color:#E63946; font-weight:bold;">💐 Sales</h2>
+    </div>
+
+    <!-- Products -->
+    <div class="product-card">
+      <div class="sale-ribbon" style="position:absolute; top:10px; left:-10px; background:#E63946; color:white; padding:5px 15px; font-size:0.9rem; font-weight:bold; transform:rotate(-15deg); border-radius:5px;">SALE</div>
+      <img src="images/red-romance.jpg" alt="Red Romance">
+      <div class="product-info">
+        <h2>Red Romance</h2>
+        <p style="font-size:0.95rem; color:#4A3426;">Size: 40 cm (W) - 60 cm (H)</p>
+        <p><span style="text-decoration:line-through; color:gray;">₱900.00</span> <span style="color:#E63946; font-weight:bold;">₱700.00</span></p>
+        <button class="add-to-cart-btn" data-name="Red Romance" data-price="700" data-img="red-romance.jpg">Add to Cart</button>
+      </div>
+    </div>
+
+    <div class="product-card">
+      <div class="sale-ribbon" style="position:absolute; top:10px; left:-10px; background:#E63946; color:white; padding:5px 15px; font-size:0.9rem; font-weight:bold; transform:rotate(-15deg); border-radius:5px;">SALE</div>
+      <img src="images/rapunzel-flower.jpg" alt="Rapunzel's Flower">
+      <div class="product-info">
+        <h2>Rapunzel's Flower</h2>
+        <p style="font-size:0.95rem; color:#4A3426;">Size: 60 cm (W) - 75 cm (H)</p>
+        <p><span style="text-decoration:line-through; color:gray;">₱2,000.00</span> <span style="color:#E63946; font-weight:bold;">₱1,000.00</span></p>
+        <button class="add-to-cart-btn" data-name="Rapunzel's Flower" data-price="1000" data-img="rapunzel-flower.jpg">Add to Cart</button>
+      </div>
+    </div>
+
+    <div class="product-card">
+      <div class="sale-ribbon" style="position:absolute; top:10px; left:-10px; background:#E63946; color:white; padding:5px 15px; font-size:0.9rem; font-weight:bold; transform:rotate(-15deg); border-radius:5px;">SALE</div>
+      <img src="images/sweet-serenity.jpg" alt="Sweet Serenity">
+      <div class="product-info">
+        <h2>Sweet Serenity</h2>
+        <p style="font-size:0.95rem; color:#4A3426;">Size: 40 cm (W) - 55 cm (H)</p>
+        <p><span style="text-decoration:line-through; color:gray;">₱800.00</span> <span style="color:#E63946; font-weight:bold;">₱500.00</span></p>
+        <button class="add-to-cart-btn" data-name="Sweet Serenity" data-price="500" data-img="sweet-serenity.jpg">Add to Cart</button>
+      </div>
+    </div>
+
+    <div class="product-card">
+      <div class="sale-ribbon" style="position:absolute; top:10px; left:-10px; background:#E63946; color:white; padding:5px 15px; font-size:0.9rem; font-weight:bold; transform:rotate(-15deg); border-radius:5px;">SALE</div>
+      <img src="images/sunrise.jpg" alt="Sunrise">
+      <div class="product-info">
+        <h2>Sunrise</h2>
+        <p style="font-size:0.95rem; color:#4A3426;">Size: 40 cm (W) - 60 cm (H)</p>
+        <p><span style="text-decoration:line-through; color:gray;">₱800.00</span> <span style="color:#E63946; font-weight:bold;">₱500.00</span></p>
+        <button class="add-to-cart-btn" data-name="Sunrise" data-price="500" data-img="sunrise.jpg">Add to Cart</button>
+      </div>
+    </div>
+
+  </section>
+
+  <!-- Footer -->
+  <footer>
+    &copy; 2025 Kira's Bloom Craft. All Rights Reserved.
+  </footer>
+
+  <!-- Scripts -->
+  <script>
+    document.addEventListener("DOMContentLoaded", function() {
+      // ===== Redirect if not logged in =====
+      const loggedInUser = JSON.parse(localStorage.getItem('loggedInUser'));
+      if (!loggedInUser) {
+        window.location.href = 'login.html';
+      }
+
+      // ===== Logout =====
+      const logoutLink = document.getElementById('logoutLink');
+      if(logoutLink){
+        logoutLink.addEventListener('click', function(e){
+          e.preventDefault();
+          localStorage.removeItem('loggedInUser'); 
+          alert('✅ You have been logged out.');
+          window.location.href = 'login.html';
+        });
+      }
+
+      // ===== Add to Cart =====
+      const buttons = document.querySelectorAll(".add-to-cart-btn");
+      buttons.forEach(btn => {
+        btn.addEventListener("click", () => {
+          const name = btn.dataset.name;
+          const price = parseFloat(btn.dataset.price);
+          const img = btn.dataset.img;
+
+          let cart = JSON.parse(localStorage.getItem("cart")) || [];
+          const existing = cart.find(item => item.name === name);
+          if (existing) {
+            existing.qty += 1;
+          } else {
+            cart.push({ name, price, img, qty: 1 });
+          }
+
+          localStorage.setItem("cart", JSON.stringify(cart));
+          alert(`🛒 ${name} has been added to your cart!`);
+          updateCartBadge();
+        });
+      });
+
+      // ===== Cart Badge =====
+      const cartBadge = document.getElementById("cartBadge");
+      function updateCartBadge() {
+        let cart = JSON.parse(localStorage.getItem("cart")) || [];
+        cartBadge.textContent = cart.reduce((acc, item) => acc + (item.qty || 1), 0);
+      }
+      updateCartBadge();
+    });
+  </script>
+</body>
+</html>

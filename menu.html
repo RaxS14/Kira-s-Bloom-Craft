@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Shop — Kira's Bloom Craft</title>
+<link rel="stylesheet" href="style.css">
+<style>
+body { margin:0; font-family:'Poppins',sans-serif; background:#fff8f5; }
+.shop-container { display:flex; flex-wrap:wrap; gap:1.5rem; justify-content:center; padding:2rem; }
+.product-card { background:#fff8f5; border-radius:12px; box-shadow:0 4px 10px rgba(0,0,0,0.1); width:220px; display:flex; flex-direction:column; padding:1rem; transition: transform 0.2s; }
+.product-card:hover { transform: translateY(-5px); }
+.product-card img { width:100%; border-radius:12px; }
+.product-info { display:flex; flex-direction:column; flex:1; justify-content:space-between; margin-top:0.5rem; }
+.product-info h2 { margin:0.5rem 0; font-size:1.1rem; text-align:center; min-height:2.5rem; }
+.product-info .description { font-size:0.8rem; text-align:center; margin-bottom:0.5rem; min-height:3rem; font-weight:bold; color:#444; }
+.product-info .extra-info { font-size:0.8rem; color:#444; text-align:center; margin-bottom:0.5rem; }
+.price { text-align:center; font-weight:bold; font-size:1rem; margin-bottom:0.5rem; }
+.add-to-cart-btn { background:#ff6b81; color:#fff; border:none; padding:0.5rem 1rem; border-radius:50px; cursor:pointer; font-weight:bold; transition: background 0.3s; margin-top:auto; }
+.add-to-cart-btn:hover { background:#ff4757; }
+footer { background:#fff8f5; text-align:center; padding:1rem; font-weight:bold; color:#ff6b81; }
+</style>
+</head>
+<body>
+
+<nav class="navbar">
+<h1>Kira's Bloom Craft</h1>
+<ul>
+  <li><a href="index.html">Home</a></li>
+  <li><a href="menu.html" class="active">Shop</a></li>
+  <li><a href="cart.html">Cart <span id="cartBadge">0</span></a></li>
+  <li><a href="reviews.html">Reviews</a></li>
+  <li><a href="about.html">About</a></li>
+  <li><a href="termsandcondition.html">Terms & Conditions</a></li>
+  <li><a href="tracking.html">Order Tracking</a></li>
+  <li><a href="customerservice.html">Customer Service</a></li>
+  <li><a href="#" id="logoutLink">Logout</a></li>
+</ul>
+<div class="nav-search">
+  <input type="text" id="searchBar" placeholder="🔍 Search products...">
+</div>
+</nav>
+
+<section class="shop-container" id="shopContainer"></section>
+
+<footer>&copy; 2025 Kira's Bloom Craft. All Rights Reserved.</footer>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const cartBadge = document.getElementById('cartBadge');
+  let cart = JSON.parse(localStorage.getItem('cart')) || [];
+
+  const updateCartBadge = () => {
+    cartBadge.textContent = cart.reduce((sum, item) => sum + (item.qty || 1), 0);
+  };
+  updateCartBadge();
+
+  // Logout
+  document.getElementById('logoutLink').addEventListener('click', e => {
+    e.preventDefault();
+    localStorage.clear();
+    alert('✅ You have been logged out.');
+    window.location.href = 'login.html';
+  });
+
+  // Load or initialize products
+  let products = JSON.parse(localStorage.getItem('products'));
+  if (!products) {
+    products = [
+      {id:101,name:"Pastel Petals",price:500,img:"pastel-petals.jpg",description:"Soft pastel-colored artificial bouquet. Size: 40 cm (W) - 60cm (H)"},
+      {id:102,name:"Mini Sunshine",price:150,img:"mini-sunshine.jpg",description:"Small, bright yellow bouquet. Size: 20 cm (W) - 30 cm (H)"},
+      {id:103,name:"Purple Kiss",price:350,img:"purple-kiss.jpg",description:"Purple bouquet symbolizing royalty and admiration. Size: 40 cm (W) - 40 cm (H)"},
+      {id:104,name:"Mini Blush Daisy",price:150,img:"mini-blush-daisy.jpg",description:"Blush-pink fuzzy wire flowers. Size: 30 cm (W) - 30 cm (H)"},
+      {id:105,name:"Café Blossom",price:550,img:"cafe-blossom.jpg",description:"Artificial bouquet with charming cafe-style vibe. Size: 40 cm (W) - 60 cm (H)"},
+      {id:106,name:"Pure",price:400,img:"pure.jpg",description:"High-quality lifelike bouquet. Size: 40 cm (W) - 60 cm (H)"},
+      {id:107,name:"Crimson Grace",price:500,img:"crimson-grace.jpg",description:"Elegant red bouquet. Size: 40 cm (W) - 60 cm (H)"},
+      {id:108,name:"Golden One",price:100,img:"golden-one.jpg",description:"Single sunflower bouquet. Size: 20 cm (W) - 30 cm (H)"},
+      {id:109,name:"Sapphire Skies",price:800,img:"sapphire-skies.jpg",description:"Sky-themed bouquet in blue. Size: 40 cm (W) - 60 cm (H)"},
+      {id:110,name:"Rapunzel's Flower",price:1000,img:"rapunzels-flower.jpg",description:"Inspired by Disney's Tangled sundrop flower. Size: 60 cm (W) - 75 cm (H)"},
+      {id:111,name:"Blush Bouquet",price:1000,img:"blush-bouquet.jpg",description:"Soft pink blush bouquet with greenery. Size: 50 cm (W) - 60 cm (H)"},
+      {id:112,name:"Red Romance",price:600,img:"red-romance.jpg",description:"Vibrant red bouquet. Size: 40 cm (W) - 60 cm (H)"},
+      {id:113,name:"Sunrise",price:500,img:"sunrise.jpg",description:"Colors mimicking a sunrise. Size: 40 cm (W) - 60 cm (H)"},
+      {id:114,name:"Ocean Bloom",price:400,img:"ocean-bloom.jpg",description:"Sea-inspired bouquet. Size: 40 cm (W) - 40 cm (H)"},
+      {id:115,name:"Mini Blue Daisy",price:100,img:"mini-blue-daisy.jpg",description:"Light blue fuzzy wire daisies. Size: 20 cm (W) - 30 cm (H)"},
+      {id:116,name:"Mini Purple Daisy",price:100,img:"mini-purple-daisy.jpg",description:"Playful purple fuzzy wire daisies. Size: 20 cm (W) - 30 cm (H)"},
+      {id:117,name:"Mini Mint Daisy",price:100,img:"mini-mint-daisy.jpg",description:"Mint green fuzzy wire daisies. Size: 20 cm (W) - 30 cm (H)"},
+      {id:118,name:"Little Scarlet",price:150,img:"little-scarlet.jpg",description:"Deep red fuzzy wire tulips. Size: 20 cm (W) - 30 cm (H)"},
+      {id:119,name:"Tangerine Dream",price:150,img:"tangerine-dream.jpg",description:"Vibrant orange fuzzy wire bouquet. Size: 20 cm (W) - 30 cm (H)"},
+      {id:120,name:"Rosé Kiss",price:350,img:"rose-kiss.jpg",description:"Tender soft pink bouquet. Size: 40 cm (W) - 40 cm (H)"},
+      {id:121,name:"Rainbow Mini Daisy",price:150,img:"rainbow-mini-daisy.jpg",description:"Pastel rainbow-colored daisies. Size: 30 cm (W) - 30 cm (H)"},
+      {id:122,name:"Roséra",price:500,img:"rosera.jpg",description:"Artificial rose bouquet. Size: 40 cm (W) - 40 cm (H)"},
+      {id:123,name:"Garden",price:1000,img:"garden.jpg",description:"Lifelike garden bouquet. Size: 60 cm (W) - 75 cm (H)"}
+    ];
+    products.forEach(p => { p.inStock = 50; p.pending = 0; p.rejected = 0; });
+    localStorage.setItem('products', JSON.stringify(products));
+  }
+
+  const shopContainer = document.getElementById('shopContainer');
+
+  function renderProducts(productsToRender) {
+    shopContainer.innerHTML = '';
+    productsToRender.forEach(prod => {
+      const card = document.createElement('div');
+      card.classList.add('product-card');
+      card.innerHTML = `
+        <img src="images/${prod.img}" alt="${prod.name}">
+        <div class="product-info">
+          <h2>${prod.name}</h2>
+          <div class="description"><strong>${prod.description}</strong></div>
+          <div class="extra-info">
+            In Stock: <strong>${prod.inStock}</strong><br>
+            Pending: <strong style="color:orange;">${prod.pending}</strong><br>
+            Rejected: <strong style="color:red;">${prod.rejected}</strong>
+          </div>
+          <div class="price">₱${prod.price.toFixed(2)}</div>
+          <button class="add-to-cart-btn" data-id="${prod.id}">Add to Cart</button>
+        </div>
+      `;
+      shopContainer.appendChild(card);
+    });
+
+    document.querySelectorAll('.add-to-cart-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const id = parseInt(btn.dataset.id);
+        const product = products.find(p => p.id === id);
+        if (product.inStock <= 0) { alert("❌ Out of stock!"); return; }
+
+        let cart = JSON.parse(localStorage.getItem('cart')) || [];
+        let existing = cart.find(i => i.id === id);
+        if (existing) existing.qty += 1;
+        else cart.push({id, name:product.name, price:product.price, img:product.img, qty:1});
+        localStorage.setItem('cart', JSON.stringify(cart));
+        updateCartBadge();
+
+        product.inStock -= 1;
+        product.pending += 1;
+        localStorage.setItem('products', JSON.stringify(products));
+
+        renderProducts(products);
+      });
+    });
+  }
+
+  renderProducts(products);
+
+  document.getElementById('searchBar').addEventListener('input', e => {
+    const query = e.target.value.toLowerCase();
+    renderProducts(products.filter(p => p.name.toLowerCase().includes(query)));
+  });
+
+  // Listen for changes in other tabs
+  window.addEventListener('storage', event => {
+    if (event.key === 'products') {
+      products = JSON.parse(localStorage.getItem('products')) || [];
+      renderProducts(products);
+    }
+  });
+});
+</script>
+</body>
+</html>

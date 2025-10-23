@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Login / Register — Kira's Bloom Craft</title>
+<style>
+  body {
+    font-family: 'Poppins', sans-serif;
+    margin: 0;
+    min-height: 100vh;
+    background: linear-gradient(135deg, #fff1f0, #ffe6e0);
+    display: flex;
+    flex-direction: column;
+    overflow-x: hidden;
+    position: relative;
+  }
+
+  /* Navbar */
+  .navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 2rem;
+    background: rgba(255,255,255,0.95);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    border-radius: 0 0 20px 20px;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+  }
+  .navbar h1 {
+    font-weight: 700;
+    background: linear-gradient(135deg, #FF6B81, #FF8C69);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    cursor: pointer;
+  }
+  .navbar ul {
+    list-style: none;
+    display: flex;
+    gap: 1rem;
+    margin: 0;
+    padding: 0;
+  }
+  .navbar ul li a {
+    text-decoration: none;
+    color: #333;
+    font-weight: 500;
+    pointer-events: none; /* LOCK all links initially */
+    opacity: 0.5;
+    transition: 0.3s;
+  }
+  .navbar ul li a.login-link {
+    pointer-events: auto; /* Terms & Conditions clickable */
+    opacity: 1;
+    color: #FF6B81;
+  }
+
+  /* Login/Register Section */
+  .login-section {
+    max-width: 650px;
+    margin: 4rem auto;
+    padding: 3rem 3.5rem;
+    background: rgba(255,255,255,0.95);
+    border-radius: 25px;
+    box-shadow: 0 15px 40px rgba(255,107,129,0.3),
+                0 0 20px rgba(255,180,180,0.2) inset;
+    position: relative;
+    overflow: hidden;
+    backdrop-filter: blur(10px);
+  }
+
+  /* Flowers */
+  .flower {
+    position: absolute;
+    border-radius: 50%;
+    opacity: 0.3;
+    animation: floatBloom infinite ease-in-out;
+  }
+  .flower:nth-child(1) { top:-40px; left:-40px; width:100px; height:100px; background: radial-gradient(circle at 30% 30%, #FF9F7A, #FF6B81); animation-duration:8s; }
+  .flower:nth-child(2) { bottom:-50px; right:-30px; width:70px; height:70px; background: radial-gradient(circle at 30% 30%, #FFB6B9, #FF6B81); animation-duration:10s; }
+  .flower:nth-child(3) { top:40%; left:-50px; width:60px; height:60px; background: radial-gradient(circle at 30% 30%, #FF8C69, #FF6B81); animation-duration:7s; }
+  .flower:nth-child(4) { bottom:20%; left:35%; width:110px; height:110px; background: radial-gradient(circle at 30% 30%, #FFC1C1, #FF8C69); animation-duration:9s; }
+  @keyframes floatBloom {
+    0% { transform: scale(0.8) rotate(0deg) translateY(0); opacity: 0.3; }
+    50% { transform: scale(1.2) rotate(20deg) translateY(20px); opacity: 0.5; }
+    100% { transform: scale(0.8) rotate(0deg) translateY(0); opacity: 0.3; }
+  }
+
+  /* Petals falling */
+  .petal {
+    position: absolute;
+    width: 15px;
+    height: 15px;
+    background: radial-gradient(circle at 30% 30%, #FF9F7A, #FF6B81);
+    border-radius: 50%;
+    opacity: 0.7;
+    pointer-events: none;
+    animation: fall linear infinite;
+  }
+  @keyframes fall {
+    0% { transform: translateY(-50px) rotate(0deg); opacity: 0; }
+    10% { opacity: 0.7; }
+    100% { transform: translateY(110vh) rotate(360deg); opacity: 0; }
+  }
+
+  /* Form */
+  h2 {
+    text-align: center;
+    color: #FF6B81;
+    font-size: 2.8rem;
+    margin-bottom: 2rem;
+    text-shadow: 1px 1px 4px rgba(255,107,129,0.5);
+    position: relative;
+    z-index: 2;
+  }
+  form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    position: relative;
+    z-index: 2;
+  }
+  input {
+    padding: 1.2rem 1.5rem;
+    border-radius: 50px;
+    border: 2px solid #FF6B81;
+    font-size: 1.2rem;
+    transition: all 0.3s;
+    box-shadow: 0 5px 15px rgba(255,107,129,0.2) inset;
+  }
+  input:focus {
+    outline: none;
+    border-color: #FF4757;
+    box-shadow: 0 0 15px rgba(255,107,129,0.5) inset;
+  }
+  button {
+    padding: 1.2rem 0;
+    border: none;
+    border-radius: 50px;
+    background: linear-gradient(135deg, #FF6B81, #FF8C69);
+    color: #fff;
+    font-weight: bold;
+    font-size: 1.3rem;
+    cursor: pointer;
+    transition: all 0.3s;
+    box-shadow: 0 10px 20px rgba(255,107,129,0.4);
+  }
+  button:hover {
+    transform: scale(1.07);
+    box-shadow: 0 15px 30px rgba(255,107,129,0.6), 0 0 20px rgba(255,180,180,0.3) inset;
+  }
+  .toggle-link {
+    text-align: center;
+    margin-top: 1.5rem;
+    font-size: 1.2rem;
+  }
+  .toggle-link a {
+    color: #FF6B81;
+    cursor: pointer;
+    text-decoration: underline;
+  }
+  .success-msg {
+    text-align: center;
+    color: #2d7a2d;
+    font-weight: bold;
+    margin-top: 0.5rem;
+    font-size: 1.15rem;
+  }
+
+  footer {
+    text-align: center;
+    padding: 1rem;
+    font-weight: bold;
+    color: #FF6B81;
+    margin-top: auto;
+  }
+</style>
+</head>
+<body>
+
+<!-- Navbar -->
+<nav class="navbar">
+  <h1>Kira's Bloom Craft</h1>
+  <ul>
+    <li><a href="#" class="">Home</a></li>
+    <li><a href="#" class="">Shop</a></li>
+    <li><a href="#" class="">Cart</a></li>
+    <li><a href="#" class="">About</a></li>
+    <li><a href="termsandcondition.html" class="login-link">Terms & Conditions</a></li>
+    <li><a href="#" class="">Customer Service</a></li>
+  </ul>
+</nav>
+
+<!-- Login / Register Section -->
+<section class="login-section">
+  <div class="flower"></div>
+  <div class="flower"></div>
+  <div class="flower"></div>
+  <div class="flower"></div>
+
+  <!-- Login Form -->
+  <div id="loginFormContainer">
+    <h2>Login</h2>
+    <form id="loginForm">
+      <input type="email" id="loginEmail" placeholder="Email" required>
+      <input type="password" id="loginPassword" placeholder="Password" required>
+      <button type="submit">Login</button>
+    </form>
+    <div class="toggle-link">Don't have an account? <a id="showRegister">Register here</a></div>
+    <p id="loginMsg" class="success-msg"></p>
+  </div>
+
+  <!-- Register Form -->
+  <div id="registerFormContainer" style="display:none;">
+    <h2>Register</h2>
+    <form id="registerForm">
+      <input type="text" id="regName" placeholder="Full Name" required>
+      <input type="email" id="regEmail" placeholder="Email" required>
+      <input type="password" id="regPassword" placeholder="Password" required>
+      <button type="submit">Register</button>
+    </form>
+    <div class="toggle-link">Already have an account? <a id="showLogin">Login here</a></div>
+    <p id="regMsg" class="success-msg"></p>
+  </div>
+</section>
+
+<footer>&copy; 2025 Kira's Bloom Craft. All Rights Reserved.</footer>
+
+<script>
+  // Toggle forms
+  const loginContainer = document.getElementById('loginFormContainer');
+  const registerContainer = document.getElementById('registerFormContainer');
+
+  document.getElementById('showRegister').addEventListener('click', () => {
+    loginContainer.style.display = 'none';
+    registerContainer.style.display = 'block';
+  });
+
+  document.getElementById('showLogin').addEventListener('click', () => {
+    registerContainer.style.display = 'none';
+    loginContainer.style.display = 'block';
+  });
+
+  // Registration
+  const registerForm = document.getElementById('registerForm');
+  const regMsg = document.getElementById('regMsg');
+  registerForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const name = document.getElementById('regName').value;
+    const email = document.getElementById('regEmail').value;
+    const password = document.getElementById('regPassword').value;
+    let users = JSON.parse(localStorage.getItem('users')) || [];
+    if(users.some(u => u.email === email)) {
+      regMsg.textContent = "⚠️ Email already registered!";
+      return;
+    }
+    users.push({name, email, password});
+    localStorage.setItem('users', JSON.stringify(users));
+    regMsg.textContent = "✅ Registration successful!";
+    registerForm.reset();
+  });
+
+  // Login
+  const loginForm = document.getElementById('loginForm');
+  const loginMsg = document.getElementById('loginMsg');
+  loginForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const email = document.getElementById('loginEmail').value;
+    const password = document.getElementById('loginPassword').value;
+    let users = JSON.parse(localStorage.getItem('users')) || [];
+    const user = users.find(u => u.email === email && u.password === password);
+    if(user){
+      localStorage.setItem('loggedInUser', JSON.stringify(user));
+      loginMsg.textContent = "✅ Login successful!";
+
+      // Enable navbar links
+      document.querySelectorAll('.navbar ul li a').forEach(link => {
+        link.style.pointerEvents = 'auto';
+        link.style.opacity = '1';
+        link.style.color = '#333';
+      });
+
+      // Redirect to home page
+      setTimeout(() => {
+        window.location.href = 'index.html';
+      }, 1000);
+    } else {
+      loginMsg.textContent = "⚠️ Invalid email or password";
+    }
+  });
+
+  // Petals
+  function createPetals(count){
+    for(let i=0; i<count; i++){
+      const petal = document.createElement('div');
+      petal.classList.add('petal');
+      petal.style.left = Math.random()*100+'vw';
+      petal.style.animationDuration = (5 + Math.random()*5)+'s';
+      petal.style.width = (10 + Math.random()*15)+'px';
+      petal.style.height = (10 + Math.random()*15)+'px';
+      petal.style.opacity = Math.random()*0.8 + 0.3;
+      document.body.appendChild(petal);
+    }
+  }
+  createPetals(25);
+</script>
+</body>
+</html>

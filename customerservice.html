@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Customer Service — Kira's Bloom Craft</title>
+
+<!-- Redirect if not logged in -->
+<script>
+  const loggedInUser = JSON.parse(localStorage.getItem('loggedInUser'));
+  if (!loggedInUser) window.location.href = 'login.html';
+</script>
+
+<!-- Google Fonts -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+
+<!-- Main Stylesheet -->
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- Navbar -->
+<nav class="navbar">
+  <h1>Kira's Bloom Craft</h1>
+  <ul>
+    <li><a href="index.html">Home</a></li>
+    <li><a href="menu.html">Shop</a></li>
+    <li><a href="cart.html">Cart <span id="cartBadge">0</span></a></li>
+    <li><a href="reviews.html">Reviews</a></li>
+    <li><a href="about.html">About</a></li>
+    <li><a href="termsandcondition.html">Terms & Conditions</a></li>
+    <li><a href="tracking.html">Order Tracking</a></li>
+    <li><a href="customerservice.html" class="active">Customer Service</a></li>
+    <li><a href="#" id="logoutLink">Logout</a></li>
+  </ul>
+  <div class="nav-search">
+    <input type="text" id="searchBar" placeholder="🔍 Search products...">
+  </div>
+</nav>
+
+<!-- Hero Section -->
+<section class="hero">
+  <div class="hero-content">
+    <h1>Customer Service 🌸</h1>
+    <p>Need assistance? Fill out the form below and we’ll get back to you shortly.</p>
+  </div>
+</section>
+
+<!-- Customer Service Form -->
+<main class="fade-in">
+  <section class="login-section">
+    <div class="login-container cs-form">
+      <h2>Contact Us</h2>
+      <form id="contactForm">
+        <label for="name">Full Name</label>
+        <input type="text" id="name" placeholder="Your Name" required />
+
+        <label for="email">Email</label>
+        <input type="email" id="email" placeholder="you@example.com" required />
+
+        <label for="subject">Subject</label>
+        <input type="text" id="subject" placeholder="Describe your concern" required />
+
+        <label for="order">Order ID (Optional)</label>
+        <input type="text" id="order" placeholder="Enter Order ID if applicable" />
+
+        <label for="message">Message</label>
+        <textarea id="message" placeholder="How can we help you?" style="width:100%; min-height:120px; padding:8px; border-radius:6px; border:1px solid #ccc; font-size:0.9rem;"></textarea>
+
+        <label for="proof">Attach Proof (Optional)</label>
+        <input type="file" id="proof" accept="image/*" />
+
+        <button type="submit">Send Message</button>
+        <p id="formResponse"></p>
+      </form>
+
+      <!-- Past Tickets -->
+      <h3 style="margin-top:2rem;">Your Previous Tickets</h3>
+      <div id="pastTickets" style="display:flex; flex-direction:column; gap:1rem;"></div>
+    </div>
+  </section>
+</main>
+
+<!-- Footer -->
+<footer>
+  <p>&copy; 2025 Kira's Bloom Craft. All Rights Reserved.</p>
+</footer>
+
+<script>
+  // Update Cart Badge
+  const cartBadge = document.getElementById('cartBadge');
+  let cart = JSON.parse(localStorage.getItem('cart')) || [];
+  function updateCartBadge() {
+    const totalQty = cart.reduce((sum, item) => sum + item.qty, 0);
+    cartBadge.textContent = totalQty;
+  }
+  updateCartBadge();
+
+  const pastTickets = document.getElementById('pastTickets');
+
+  // Render tickets
+  function renderTickets() {
+    const csMessages = JSON.parse(localStorage.getItem('csMessages')) || [];
+    pastTickets.innerHTML = '';
+    csMessages.reverse().forEach(ticket => {
+      const div = document.createElement('div');
+      div.style.border = '1px solid #ccc';
+      div.style.padding = '10px';
+      div.style.borderRadius = '6px';
+      div.style.background = '#fff';
+      div.innerHTML = `
+        <p><strong>Name:</strong> ${ticket.name}</p>
+        <p><strong>Email:</strong> ${ticket.email}</p>
+        <p><strong>Subject:</strong> ${ticket.subject}</p>
+        <p><strong>Order ID:</strong> ${ticket.order || 'N/A'}</p>
+        <p><strong>Message:</strong> ${ticket.message}</p>
+        ${ticket.proof ? `<p><strong>Proof:</strong> <a href="${ticket.proof}" target="_blank"><img src="${ticket.proof}" style="max-width:150px; border-radius:6px; margin-top:5px;"></a></p>` : ''}
+        <p><strong>Status:</strong> ${ticket.status}</p>
+        <p style="font-size:0.8rem; color:#555;">Submitted: ${new Date(ticket.timestamp).toLocaleString()}</p>
+      `;
+      pastTickets.appendChild(div);
+    });
+  }
+
+  // Contact Form Submission
+  const contactForm = document.getElementById('contactForm');
+  const formResponse = document.getElementById('formResponse');
+  contactForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const proofInput = document.getElementById('proof');
+    const file = proofInput.files[0];
+
+    if(file && file.size > 5 * 1024 * 1024){
+      formResponse.textContent = "❌ File too large! Maximum size 5MB.";
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = function(event){
+      const proofData = event.target.result;
+      const csMessages = JSON.parse(localStorage.getItem('csMessages')) || [];
+      csMessages.push({
+        id: Date.now(),
+        name: document.getElementById('name').value.trim(),
+        email: document.getElementById('email').value.trim(),
+        subject: document.getElementById('subject').value.trim(),
+        order: document.getElementById('order').value.trim(),
+        message: document.getElementById('message').value.trim(),
+        proof: proofData || null,
+        status: "Pending",
+        timestamp: new Date().toISOString()
+      });
+      localStorage.setItem('csMessages', JSON.stringify(csMessages));
+      formResponse.textContent = "✅ Thank you! Your message has been sent 🌸";
+      contactForm.reset();
+      renderTickets();
+    }
+
+    if(file){
+      reader.readAsDataURL(file);
+    } else {
+      reader.onload({target:{result:null}});
+    }
+  });
+
+  // Live update when localStorage changes (admin updates status)
+  window.addEventListener('storage', () => {
+    renderTickets();
+  });
+
+  renderTickets(); // Initial render
+
+  // Logout Button
+  const logoutLink = document.getElementById('logoutLink');
+  logoutLink.addEventListener('click', (e) => {
+    e.preventDefault();
+    localStorage.clear();
+    alert('✅ You have been successfully logged out.');
+    window.location.href = 'login.html';
+  });
+</script>
+</body>
+</html>

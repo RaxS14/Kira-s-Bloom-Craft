@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Inventory - Kira’s BloomCraft Admin</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/remixicon/fonts/remixicon.css">
+  <style>
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: #fff8f5;
+      margin: 0;
+      padding: 2rem;
+    }
+
+    header {
+      background: linear-gradient(135deg, #FFCBA4, #FF9F7A);
+      color: #fff;
+      padding: 1rem 1.5rem;
+      border-radius: 12px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+      margin-bottom: 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    header h1 {
+      margin: 0;
+      font-size: 1.5rem;
+    }
+
+    a.back {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      background: #ff7043;
+      color: #fff;
+      padding: 0.6rem 1rem;
+      border-radius: 10px;
+      text-decoration: none;
+      font-weight: 600;
+      box-shadow: 0 3px 6px rgba(0,0,0,0.1);
+      transition: 0.3s ease;
+    }
+
+    a.back:hover {
+      background: #f4511e;
+      transform: translateY(-2px);
+    }
+
+    .inventory-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1.5rem;
+      justify-content: center;
+    }
+
+    .product-card {
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+      width: 230px;
+      display: flex;
+      flex-direction: column;
+      padding: 1rem;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .product-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+    }
+
+    .product-card img {
+      width: 100%;
+      border-radius: 12px;
+      object-fit: cover;
+      height: 160px;
+    }
+
+    .product-info h2 {
+      margin: 0.5rem 0;
+      font-size: 1rem;
+      text-align: center;
+      color: #333;
+    }
+
+    .description {
+      font-size: 0.8rem;
+      text-align: center;
+      color: #666;
+      margin-bottom: 0.5rem;
+      min-height: 2rem;
+    }
+
+    .stock-info {
+      text-align: center;
+      font-size: 0.9rem;
+      margin-top: 0.5rem;
+      line-height: 1.5;
+    }
+
+    .price {
+      text-align: center;
+      font-weight: bold;
+      margin-top: 0.5rem;
+      font-size: 1rem;
+      color: #ff7043;
+    }
+
+    /* Buttons */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.3rem;
+      background: #ff9f7a;
+      color: #fff;
+      padding: 0.5rem 1rem;
+      border-radius: 8px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      border: none;
+      cursor: pointer;
+      transition: 0.3s ease;
+      margin-top: 0.8rem;
+    }
+
+    .btn:hover {
+      background: #f97b4d;
+      transform: translateY(-2px);
+    }
+
+    .edit-box {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.3rem;
+      margin-top: 0.5rem;
+    }
+
+    .edit-row {
+      display: flex;
+      justify-content: space-between;
+      width: 100%;
+      font-size: 0.85rem;
+      color: #333;
+    }
+
+    .edit-box input {
+      width: 60px;
+      padding: 0.2rem;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+      text-align: center;
+      font-size: 0.8rem;
+    }
+
+    .save-btn {
+      background: #4caf50;
+    }
+
+    .save-btn:hover {
+      background: #43a047;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>📦 Inventory Overview</h1>
+  <a href="admin.html" class="back"><i class="ri-arrow-left-line"></i> Back to Dashboard</a>
+</header>
+
+<section class="inventory-container" id="inventoryContainer"></section>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const container = document.getElementById('inventoryContainer');
+  let products = JSON.parse(localStorage.getItem('products')) || [];
+
+  const render = () => {
+    container.innerHTML = '';
+    if (products.length === 0) {
+      container.innerHTML = '<p>No products found in storage.</p>';
+      return;
+    }
+
+    products.forEach((prod, index) => {
+      const card = document.createElement('div');
+      card.classList.add('product-card');
+      card.innerHTML = `
+        <img src="images/${prod.img}" alt="${prod.name}">
+        <div class="product-info">
+          <h2>${prod.name}</h2>
+          <div class="description">${prod.description}</div>
+          <div class="stock-info">
+            <strong>In Stock: <span style="color:green;">${prod.inStock ?? 0}</span></strong><br>
+            <strong>Pending: <span style="color:orange;">${prod.pending ?? 0}</span></strong><br>
+            <strong>Rejected: <span style="color:red;">${prod.rejected ?? 0}</span></strong>
+          </div>
+          <div class="price">₱${prod.price.toFixed(2)}</div>
+          <div class="edit-box">
+            <div class="edit-row">
+              <label>In Stock:</label>
+              <input type="number" min="0" id="stock-${index}" value="${prod.inStock ?? 0}">
+            </div>
+            <div class="edit-row">
+              <label>Pending:</label>
+              <input type="number" min="0" id="pending-${index}" value="${prod.pending ?? 0}">
+            </div>
+            <div class="edit-row">
+              <label>Rejected:</label>
+              <input type="number" min="0" id="rejected-${index}" value="${prod.rejected ?? 0}">
+            </div>
+            <button class="btn save-btn" data-index="${index}">💾 Save Changes</button>
+          </div>
+          <button class="btn change-stock" data-index="${index}">
+            <i class="ri-edit-2-line"></i> Change Stock
+          </button>
+        </div>
+      `;
+      container.appendChild(card);
+    });
+  };
+
+  render();
+
+  container.addEventListener('click', (e) => {
+    const changeBtn = e.target.closest('.change-stock');
+    const saveBtn = e.target.closest('.save-btn');
+
+    // Toggle edit box
+    if (changeBtn) {
+      const index = changeBtn.getAttribute('data-index');
+      const card = changeBtn.closest('.product-card');
+      const editBox = card.querySelector('.edit-box');
+      editBox.style.display = editBox.style.display === 'none' ? 'flex' : 'none';
+    }
+
+    // Save button handler
+    if (saveBtn) {
+      const index = saveBtn.getAttribute('data-index');
+      const stockInput = document.getElementById(`stock-${index}`);
+      const pendingInput = document.getElementById(`pending-${index}`);
+      const rejectedInput = document.getElementById(`rejected-${index}`);
+
+      const newStock = parseInt(stockInput.value);
+      const newPending = parseInt(pendingInput.value);
+      const newRejected = parseInt(rejectedInput.value);
+
+      if ([newStock, newPending, newRejected].some(isNaN) || newStock < 0 || newPending < 0 || newRejected < 0) {
+        alert("❌ Please enter valid numbers for all fields!");
+        return;
+      }
+
+      products[index].inStock = newStock;
+      products[index].pending = newPending;
+      products[index].rejected = newRejected;
+
+      localStorage.setItem('products', JSON.stringify(products));
+      alert(`✅ Updated stocks for ${products[index].name}`);
+      render();
+    }
+  });
+});
+</script>
+
+</body>
+</html>

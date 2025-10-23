@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Customer Reviews — Kira's Bloom Craft</title>
+
+<!-- Google Fonts -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+<style>
+:root {
+  --peach-light: #FFCBA4;
+  --peach-medium: #FF9F7A;
+  --peach-dark: #FF8C69;
+  --peach-accent: #FF6B4A;
+  --text-dark: #2C1810;
+  --text-medium: #4A3426;
+  --bg-cream: #FFF9F5;
+  --white: #FFFFFF;
+  --shadow-sm: 0 2px 8px rgba(255, 156, 122, 0.15);
+  --shadow-md: 0 4px 16px rgba(255, 156, 122, 0.2);
+}
+
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family:'Poppins',sans-serif; background:var(--bg-cream); color:var(--text-dark); }
+
+/* Navbar */
+.navbar { display:flex; align-items:center; justify-content:space-between; background:rgba(255,255,255,0.95); padding:1rem 2rem; position:sticky; top:0; z-index:1000; box-shadow:var(--shadow-sm); backdrop-filter:blur(10px); border-bottom:2px solid var(--peach-accent); }
+.navbar h1 { font-size:1.8rem; font-weight:800; background:linear-gradient(135deg,var(--peach-dark),var(--peach-accent)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; cursor:pointer; margin-right:2rem; }
+.navbar ul { display:flex; list-style:none; gap:0.5rem; align-items:center; }
+.navbar ul li a { text-decoration:none; color:var(--text-medium); font-weight:500; padding:0.6rem 1.2rem; border-radius:25px; transition:all 0.3s ease; }
+.navbar ul li a:hover { color:var(--white); background:linear-gradient(135deg,var(--peach-light),var(--peach-medium)); }
+.navbar ul li a.active { background:linear-gradient(135deg,var(--peach-medium),var(--peach-dark)); color:var(--white); font-weight:600; box-shadow:var(--shadow-sm); }
+
+/* Status Summary Box */
+.status-summary { max-width:1200px; margin:2rem auto; display:flex; justify-content:space-around; gap:1rem; flex-wrap:wrap; }
+.status-box { flex:1 1 200px; background:var(--white); border-radius:12px; padding:1rem 1.5rem; box-shadow:var(--shadow-md); text-align:center; transition: transform 0.2s; }
+.status-box:hover { transform:translateY(-3px); }
+.status-box h3 { font-size:1.2rem; color:var(--peach-accent); margin-bottom:0.5rem; }
+.status-box p { font-size:1.5rem; font-weight:700; color:var(--text-dark); }
+
+/* Review Feed */
+main.review-main { max-width:1200px; margin:2rem auto; padding:0 2rem; display:flex; flex-direction:column; gap:2rem; }
+.review-feed { display:flex; flex-direction:column; gap:1.5rem; }
+.review-card { background:var(--white); border-radius:12px; padding:1.5rem; box-shadow:var(--shadow-md); display:flex; gap:1rem; align-items:flex-start; transition:transform 0.2s; flex-wrap:wrap; }
+.review-card:hover { transform:translateY(-3px); }
+.review-content { flex:1; }
+.review-name { font-weight:700; color:var(--peach-accent); margin-bottom:0.3rem; }
+.review-stars { color:var(--peach-dark); font-size:1.1rem; margin-bottom:0.5rem; }
+.review-message { color:var(--text-medium); }
+.review-proof { width:100px; height:100px; object-fit:cover; border-radius:8px; cursor:pointer; }
+
+/* Add Review Button */
+#addReviewBtn { 
+  padding:0.8rem 1.5rem; 
+  background:var(--peach-accent); 
+  color:var(--white); 
+  font-weight:600; 
+  border:none; 
+  border-radius:8px; 
+  cursor:pointer; 
+  transition:0.3s;
+}
+#addReviewBtn:hover { background:var(--peach-dark); }
+
+/* Review Modal */
+#reviewModal {
+  display:none; position:fixed; top:0; left:0; width:100%; height:100%;
+  background:rgba(0,0,0,0.5); justify-content:center; align-items:center; z-index:2000;
+}
+#reviewModal .modal-content {
+  background:var(--white); padding:2rem; border-radius:12px; max-width:500px; width:90%; position:relative;
+}
+#reviewModal #closeModal {
+  position:absolute; top:10px; right:15px; cursor:pointer; font-size:1.2rem; font-weight:bold;
+}
+#reviewModal input, #reviewModal textarea, #reviewModal select {
+  width:100%; margin-bottom:1rem; padding:0.5rem;
+}
+#reviewModal button {
+  width:100%; padding:0.7rem; background:var(--peach-medium); color:var(--white);
+  border:none; border-radius:8px; cursor:pointer; font-weight:600;
+}
+#reviewModal button:hover { background:var(--peach-dark); }
+
+footer { background:var(--white); text-align:center; padding:1.5rem; font-weight:600; color:var(--peach-accent); border-top:1px solid rgba(255,159,122,0.2); margin-top:2rem; }
+</style>
+</head>
+<body>
+
+<!-- Navbar -->
+<nav class="navbar">
+  <h1>Kira's Bloom Craft</h1>
+  <ul>
+    <li><a href="index.html">Home</a></li>
+    <li><a href="menu.html">Shop</a></li>
+    <li><a href="cart.html">Cart</a></li>
+    <li><a href="reviews.html" class="active">Reviews</a></li>
+    <li><a href="about.html">About</a></li>
+    <li><a href="termsandcondition.html">Terms & Conditions</a></li>
+    <li><a href="tracking.html">Order Tracking</a></li>
+    <li><a href="customerservice.html">Customer Service</a></li>
+    <li><a href="#" id="logoutLink">Logout</a></li>
+  </ul>
+</nav>
+
+<!-- Status Summary -->
+<section class="status-summary" id="statusSummary"></section>
+
+<!-- Add Review Button -->
+<div style="text-align:center; margin-bottom:2rem;">
+  <button id="addReviewBtn">🌸 Add Your Review 🌸</button>
+</div>
+
+<!-- Reviews -->
+<main class="review-main">
+  <h2 style="text-align:center; color:var(--peach-accent); margin-bottom:2rem;">🌸 What Our Customers Say 🌸</h2>
+  <div class="review-feed" id="reviewFeed"></div>
+</main>
+
+<!-- Review Modal -->
+<div id="reviewModal">
+  <div class="modal-content">
+    <span id="closeModal">×</span>
+    <h3 style="margin-bottom:1rem; color:var(--peach-accent); text-align:center;">Add Your Review</h3>
+    <label>Your Name:</label>
+    <input type="text" id="reviewName" placeholder="Enter your name">
+    <label>Rating:</label>
+    <select id="reviewRating">
+      <option value="5">⭐⭐⭐⭐⭐</option>
+      <option value="4">⭐⭐⭐⭐☆</option>
+      <option value="3">⭐⭐⭐☆☆</option>
+      <option value="2">⭐⭐☆☆☆</option>
+      <option value="1">⭐☆☆☆☆</option>
+    </select>
+    <label>Comment:</label>
+    <textarea id="reviewText" rows="4" placeholder="Write your comment here..."></textarea>
+    <label>Attach Proof Picture:</label>
+    <input type="file" id="reviewImage" accept="image/*">
+    <button id="submitReview">Submit Review</button>
+  </div>
+</div>
+
+<footer>
+  &copy; 2025 Kira's Bloom Craft. All Rights Reserved.
+</footer>
+
+<script>
+  // Logout
+  document.getElementById('logoutLink')?.addEventListener('click', e => {
+    e.preventDefault();
+    localStorage.clear();
+    alert('✅ You have been logged out.');
+    window.location.href = 'login.html';
+  });
+
+  // Status Summary
+  function renderStatusSummary(){
+    const products = JSON.parse(localStorage.getItem('products')) || [];
+    const cart = JSON.parse(localStorage.getItem('cart')) || [];
+    const orders = JSON.parse(localStorage.getItem('orders')) || [];
+
+    let sold = products.reduce((sum,p)=>sum + (p.soldQty||0),0);
+    let pending = cart.reduce((sum,item)=>sum + (item.qty||0),0);
+    pending += orders.filter(o=>o.status==="Pending").reduce((sum,o)=>sum+o.qty,0);
+    let rejected = products.reduce((sum,p)=>sum + (p.rejected||0),0);
+    let cancelled = products.reduce((sum,p)=>sum + (p.cancelled||0),0);
+    cancelled += orders.filter(o=>o.status==="Cancelled").length;
+
+    const statuses = [
+      {label:'Sold', value:sold, color:'#2ecc71'},
+      {label:'Pending', value:pending, color:'#f39c12'},
+      {label:'Rejected / Cancelled', value:rejected+cancelled, color:'#e74c3c'}
+    ];
+
+    const statusSummary = document.getElementById('statusSummary');
+    statusSummary.innerHTML='';
+    statuses.forEach(stat=>{
+      const box=document.createElement('div');
+      box.classList.add('status-box');
+      box.innerHTML=`<h3>${stat.label}</h3><p style="color:${stat.color}">${stat.value}</p>`;
+      statusSummary.appendChild(box);
+    });
+  }
+
+  renderStatusSummary();
+  window.addEventListener('storage', e=>{
+    if(['cart','products','orders'].includes(e.key)) renderStatusSummary();
+  });
+  window.syncStatus = renderStatusSummary;
+
+  // 🌸 Emoji Avatars + Real Images 🌸
+  const emojiAvatars = ['🌸','💐','🌻','🌷','🌹','🪻','🌺','🌼','🍃','🌿','🍄','✨'];
+
+  const sampleReviews = [
+    { name: "Ella Mae", rating: 5, comment: "Absolutely loved the Pastel Petals! So soft and elegant, perfect for my living room.", image: "images/pastel-petals.jpg" },
+    { name: "Rina Joy", rating: 4, comment: "The Mini Sunshine bouquet brightened up my desk. A little smaller than expected but still cute!", image: "images/mini-sunshine.jpg" },
+    { name: "Kurt Villanueva", rating: 5, comment: "Bought Purple Kiss for my girlfriend — she adored it! 💜 Totally worth it.", image: "images/purple-kiss.jpg" },
+    { name: "Hazel L.", rating: 5, comment: "Café Blossom fits perfectly in my café corner. Aesthetic and smells amazing!", image: "images/cafe-blossom.jpg" },
+    { name: "Clara D.", rating: 4, comment: "Loved the Mini Blush Daisy! Looks so realistic.", image: "images/mini-blush-daisy.jpg" },
+    { name: "Tessa C.", rating: 5, comment: "The Golden One is adorable and simple — love it! 🌻", image: "images/golden-one.jpg" },
+    { name: "Ava L.", rating: 5, comment: "Blush Bouquet was my wedding pick! So beautiful and detailed.", image: "images/blush-bouquet.jpg" },
+    { name: "Nate G.", rating: 4, comment: "Ocean Bloom looks chill and calming. Perfect for my beach-themed setup!", image: "images/ocean-bloom.jpg" },
+    { name: "Lyra A.", rating: 5, comment: "Rapunzel's Flower is magical! 🌸✨ A total fairytale vibe.", image: "images/rapunzels-flower.jpg" },
+    { name: "Bea R.", rating: 4, comment: "Red Romance arrived beautifully packed. Great for gifts!", image: "images/red-romance.jpg" }
+  ].map(r => ({ ...r, avatar: emojiAvatars[Math.floor(Math.random()*emojiAvatars.length)] }));
+
+  const storedReviews = JSON.parse(localStorage.getItem('reviews')) || [];
+
+  function renderReviews(){
+    const reviewFeed = document.getElementById('reviewFeed');
+    reviewFeed.innerHTML = '';
+
+    const allReviews = [...sampleReviews, ...storedReviews.map(r=>({...r, avatar: emojiAvatars[Math.floor(Math.random()*emojiAvatars.length)]}))];
+    allReviews.sort(() => Math.random() - 0.5);
+
+    allReviews.forEach(r=>{
+      const card=document.createElement('div');
+      card.classList.add('review-card');
+      card.innerHTML=`
+        <div class="review-content">
+          <p class="review-name">${r.avatar || '🌷'} ${r.name}</p>
+          <p class="review-stars">${'⭐'.repeat(r.rating)}${'☆'.repeat(5-r.rating)}</p>
+          <p class="review-message">${r.comment}</p>
+        </div>
+        ${r.image?`<img src="${r.image}" class="review-proof" onclick="window.open('${r.image}','_blank')">`:''}
+      `;
+      reviewFeed.appendChild(card);
+    });
+  }
+
+  renderReviews();
+
+  // 🌼 Add Review Modal 🌼
+  const addReviewBtn=document.getElementById('addReviewBtn');
+  const reviewModal=document.getElementById('reviewModal');
+  const closeModal=document.getElementById('closeModal');
+  const submitReview=document.getElementById('submitReview');
+
+  addReviewBtn.addEventListener('click',()=>reviewModal.style.display='flex');
+  closeModal.addEventListener('click',()=>reviewModal.style.display='none');
+  window.addEventListener('click', e=>{if(e.target===reviewModal) reviewModal.style.display='none';});
+
+  submitReview.addEventListener('click',()=>{
+    const name=document.getElementById('reviewName').value.trim() || 'Anonymous';
+    const text=document.getElementById('reviewText').value.trim();
+    const rating=parseInt(document.getElementById('reviewRating').value);
+    const imageFile=document.getElementById('reviewImage').files[0];
+
+    if(!text){alert('Please write a comment!'); return;}
+
+    const reader=new FileReader();
+    reader.onload=function(e){
+      const imgSrc=e.target.result;
+      const review={name, rating, comment:text, image:imgSrc||null};
+      storedReviews.unshift(review);
+      localStorage.setItem('reviews', JSON.stringify(storedReviews));
+      renderReviews();
+      reviewModal.style.display='none';
+      document.getElementById('reviewText').value='';
+      document.getElementById('reviewImage').value='';
+      document.getElementById('reviewName').value='';
+      document.getElementById('reviewRating').value='5';
+    }
+
+    if(imageFile) reader.readAsDataURL(imageFile);
+    else reader.onload({target:{result:null}});
+  });
+</script>
+</body>
+</html>

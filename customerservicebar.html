@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Customer Service — Kira's Bloom Craft</title>
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    /* --- Customer Service Form Styling --- */
+    .cs-form {
+      max-width: 600px;
+      margin: 2rem auto;
+      padding: 1.5rem;
+      background: #fff8f5;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+    .cs-form h2 {
+      margin-bottom: 1rem;
+      color: #ff6b81;
+      text-align: center;
+    }
+    .cs-form label {
+      display: block;
+      margin-bottom: 0.3rem;
+      font-weight: bold;
+    }
+    .cs-form input,
+    .cs-form textarea {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 1rem;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      font-size: 1rem;
+    }
+    .cs-form button {
+      display: block;
+      width: 100%;
+      background: #ff6b81;
+      color: #fff;
+      border: none;
+      padding: 12px;
+      border-radius: 50px;
+      font-weight: bold;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+    .cs-form button:hover {
+      background: #ff4757;
+    }
+    #formResponse {
+      margin-top: 1rem;
+      text-align: center;
+      color: #2d7a2d;
+      font-weight: bold;
+    }
+    /* Navbar search bar */
+    .nav-search {
+      margin-left: auto;
+    }
+    .nav-search input {
+      padding: 6px 12px;
+      border-radius: 20px;
+      border: 1px solid #ccc;
+      font-size: 0.95rem;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Navbar -->
+  <nav class="navbar">
+    <h1>Kira's Bloom Craft</h1>
+    <ul>
+      <li><a href="index.html">Home</a></li>
+      <li><a href="menu.html">Shop</a></li>
+      <li><a href="cart.html">Cart <span id="cartBadge">0</span></a></li>
+      <li><a href="about.html">About</a></li>
+      <li><a href="status.html">Order Status</a></li>
+      <li><a href="customerservice.html" class="active">Customer Service</a></li>
+    </ul>
+    <!-- Search Bar -->
+    <div class="nav-search">
+      <input type="text" id="searchBar" placeholder="🔍 Search products..." />
+    </div>
+  </nav>
+
+  <!-- Hero Section -->
+  <header class="about-hero">
+    <div class="about-hero-text">
+      <h2>Customer Service 🌸</h2>
+      <p>Need help? Fill out the form below and our team will respond quickly.</p>
+    </div>
+  </header>
+
+  <!-- Customer Service Form -->
+  <main>
+    <section>
+      <form id="contactForm" class="cs-form">
+        <h2>Contact Us</h2>
+
+        <label for="name">Full Name</label>
+        <input type="text" id="name" placeholder="Your Name" required />
+
+        <label for="email">Email</label>
+        <input type="email" id="email" placeholder="you@example.com" required />
+
+        <label for="subject">Subject</label>
+        <input type="text" id="subject" placeholder="Describe your concern" required />
+
+        <label for="order">Order ID (Optional)</label>
+        <input type="text" id="order" placeholder="Enter Order ID if applicable" />
+
+        <label for="message">Message</label>
+        <textarea id="message" rows="5" placeholder="How can we help you?" required></textarea>
+
+        <button type="submit">Send Message</button>
+        <p id="formResponse"></p>
+      </form>
+    </section>
+  </main>
+
+  <!-- Footer -->
+  <footer>
+    &copy; 2025 Kira's Bloom Craft. All Rights Reserved.
+  </footer>
+
+  <!-- JS -->
+  <script>
+    // --- Handle Contact Form ---
+    const contactForm = document.getElementById('contactForm');
+    const formResponse = document.getElementById('formResponse');
+
+    contactForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      formResponse.textContent = "✅ Thank you! Your message has been sent 🌸";
+      contactForm.reset();
+    });
+
+    // --- Update Cart Badge ---
+    const cartBadgeElems = document.querySelectorAll('#cartBadge');
+    let cart = JSON.parse(localStorage.getItem('cart')) || [];
+
+    function updateCartBadge() {
+      const totalQty = cart.reduce((sum, item) => sum + item.qty, 0);
+      cartBadgeElems.forEach(badge => badge.textContent = totalQty);
+    }
+
+    updateCartBadge();
+  </script>
+
+</body>
+</html>

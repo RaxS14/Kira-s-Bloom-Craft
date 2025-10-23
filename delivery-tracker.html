@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Delivery Tracker — Dreamrock Buhisan</title>
+
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.css" />
+
+<style>
+  html, body { height: 100%; margin: 0; font-family: Arial, sans-serif; }
+  #map { height: 100%; width: 100%; }
+  .info-box {
+    position: absolute;
+    top: 15px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: white;
+    padding: 10px 20px;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+    z-index: 1000;
+    text-align: center;
+    font-size: 16px;
+  }
+  .motor-emoji { font-size: 32px; text-align: center; }
+</style>
+</head>
+
+<body>
+<div class="info-box" id="infoBox">🛵 Initializing delivery tracker...</div>
+<div id="map"></div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.js"></script>
+<script src="https://unpkg.com/leaflet-rotatedmarker/leaflet.rotatedMarker.js"></script>
+
+<script>
+const map = L.map("map").setView([10.3157, 123.8854], 13);
+L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+  attribution: '&copy; OpenStreetMap contributors'
+}).addTo(map);
+
+const infoBox = document.getElementById("infoBox");
+const shopLocation = [10.2918, 123.8705];
+const emojiIcon = L.divIcon({ className: "motor-emoji", html: "🏍️", iconSize: [32,32], iconAnchor: [16,16] });
+
+let marker, routeControl, animationFrame, coords = [], step = 0;
+
+// Get delivery data
+function getDeliveryData() {
+  const customerCoords = JSON.parse(localStorage.getItem("lastOrderCoords"));
+  const currentOrderId = localStorage.getItem("lastOrderId");
+  const orders = JSON.parse(localStorage.getItem("orders")) || [];
+  let orderStatus = "Out for Delivery";
+  if(currentOrderId){
+    const order = orders.find(o => o.id === currentOrderId);
+    if(order) orderStatus = order.status;
+  }
+  return { customerCoords, currentOrderId, orderStatus };
+}
+
+// Initialize or reset delivery
+function initializeDelivery() {
+  const { customerCoords, currentOrderId, orderStatus } = getDeliveryData();
+  
+  if(!customerCoords) {
+    infoBox.innerHTML = "⚠️ No delivery location selected. Go to Cart and select a location.";
+    return;
+  }
+
+  // Remove old route/marker
+  if(routeControl) map.removeControl(routeControl);
+  if(marker) map.removeLayer(marker);
+  if(animationFrame) cancelAnimationFrame(animationFrame);
+
+  // Shop & customer markers
+  L.marker(shopLocation).addTo(map).bindPopup("🏪 Dreamrock Buhisan").openPopup();
+  L.marker(customerCoords).addTo(map).bindPopup("📦 Customer").openPopup();
+
+  // Determine starting point
+  const lastMotorOrderId = localStorage.getItem("lastMotorOrderId");
+  let lastPos = JSON.parse(localStorage.getItem("lastMotorPos")) || shopLocation.slice();
+  step = parseInt(localStorage.getItem("lastMotorStep")) || 0;
+  let currentPos = lastPos.slice();
+
+  if(lastMotorOrderId !== currentOrderId) {
+    currentPos = shopLocation.slice();
+    step = 0;
+    localStorage.setItem("lastMotorOrderId", currentOrderId);
+    localStorage.setItem("lastMotorPos", JSON.stringify(currentPos));
+    localStorage.setItem("lastMotorStep", step);
+  }
+
+  marker = L.marker(currentPos, {icon: emojiIcon, rotationAngle:0}).addTo(map);
+
+  if(orderStatus !== "Out for Delivery") {
+    infoBox.innerHTML = `ℹ️ Order status: ${orderStatus}. Motorcycle paused.`;
+    return;
+  }
+
+  // Routing
+  routeControl = L.Routing.control({
+    waypoints: [L.latLng(shopLocation), L.latLng(customerCoords)],
+    router: L.Routing.osrmv1({ serviceUrl: 'https://router.project-osrm.org/route/v1' }),
+    addWaypoints: false,
+    draggableWaypoints: false,
+    fitSelectedRoutes: true,
+    createMarker: ()=>null
+  }).on('routesfound', function(e){
+    coords = e.routes[0].coordinates;
+    animate();
+  }).addTo(map);
+}
+
+// Animation loop
+function animate() {
+  const { orderStatus } = getDeliveryData();
+
+  if(orderStatus !== "Out for Delivery") {
+    infoBox.innerHTML = `ℹ️ Order status: ${orderStatus}. Motorcycle paused.`;
+    animationFrame = requestAnimationFrame(animate);
+    return;
+  }
+
+  if(step >= coords.length-1){
+    marker.setLatLng(coords[coords.length-1]);
+    infoBox.innerHTML = "✅ Delivered successfully!";
+    localStorage.removeItem("lastMotorPos");
+    localStorage.removeItem("lastMotorStep");
+    return;
+  }
+
+  const current = coords[step];
+  const next = coords[step+1];
+  const totalDistance = map.distance(current, next);
+  const totalDuration = 5; // approximate duration per segment in seconds
+  const fps = 60;
+  const frames = Math.max(Math.round(totalDuration*fps), 1);
+
+  const deltaLat = (next.lat - current.lat)/frames;
+  const deltaLng = (next.lng - current.lng)/frames;
+  let frame = 0;
+  let currentPos = [current.lat, current.lng];
+
+  function stepFrame() {
+    const { orderStatus: liveStatus } = getDeliveryData();
+    if(liveStatus !== "Out for Delivery") {
+      infoBox.innerHTML = `ℹ️ Order status: ${liveStatus}. Motorcycle paused.`;
+      animationFrame = requestAnimationFrame(stepFrame);
+      return;
+    }
+
+    if(frame >= frames){
+      step++;
+      localStorage.setItem("lastMotorStep", step);
+      localStorage.setItem("lastMotorPos", JSON.stringify([next.lat,next.lng]));
+      animate();
+      return;
+    }
+
+    currentPos[0] += deltaLat;
+    currentPos[1] += deltaLng;
+    marker.setLatLng(currentPos);
+    const angle = Math.atan2(next.lat - currentPos[0], next.lng - currentPos[1]) * 180 / Math.PI;
+    marker.setRotationAngle(angle);
+    localStorage.setItem("lastMotorPos", JSON.stringify(currentPos));
+    frame++;
+    infoBox.innerHTML = "🛵 On the way!";
+    animationFrame = requestAnimationFrame(stepFrame);
+  }
+
+  stepFrame();
+}
+
+// Live update listener
+window.addEventListener('storage', function(e) {
+  if(['lastOrderCoords','lastOrderId','orders'].includes(e.key) || e.key === null) {
+    initializeDelivery();
+  }
+});
+
+// Start
+initializeDelivery();
+</script>
+</body>
+</html>

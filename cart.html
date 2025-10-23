@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cart — Kira's Bloom Craft</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<style>
+body { margin:0; font-family:'Poppins',sans-serif; background:#fff8f5; }
+.navbar { background:#fff; padding:1rem 2rem; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; box-shadow:0 4px 10px rgba(0,0,0,0.1); position:sticky; top:0; z-index:1000; border-bottom:2px solid #FF6B81; }
+.navbar h1 { font-size:1.8rem; font-weight:800; background:linear-gradient(135deg,#FF8C69,#FF6B4A); -webkit-background-clip:text; -webkit-text-fill-color:transparent; cursor:pointer; }
+.navbar ul { display:flex; list-style:none; gap:0.8rem; flex-wrap:wrap; margin:0; padding:0; }
+.navbar ul li a { text-decoration:none; color:#4A3426; font-weight:500; padding:0.6rem 1.2rem; border-radius:50px; transition:all 0.3s; }
+.navbar ul li a:hover, .navbar ul li a.active { background:linear-gradient(135deg,#FF9F7A,#FF8C69); color:#fff; transform:scale(1.05); }
+.nav-search input { padding:0.4rem 0.6rem; border-radius:50px; border:1px solid #FF6B81; transition:all 0.3s; }
+.nav-search input:focus { outline:none; border-color:#FF4757; box-shadow:0 0 5px rgba(255,107,129,0.5); }
+
+.cart-main { max-width:1200px; margin:2rem auto; padding:0 2rem; display:flex; gap:2rem; flex-wrap:wrap; }
+.cart-items { flex:2; background:#fff8f5; border-radius:12px; padding:1rem; box-shadow:0 4px 10px rgba(0,0,0,0.1); }
+.cart-items>p { text-align:center; font-weight:bold; color:#FF6B81; padding:3rem 0; }
+.cart-item { display:flex; align-items:center; justify-content:space-between; gap:1rem; background:#fff8f5; padding:1rem; border-radius:12px; box-shadow:0 4px 10px rgba(0,0,0,0.05); border:1px solid rgba(255,107,129,0.2); }
+.cart-item img { width:80px; height:80px; object-fit:cover; border-radius:12px; }
+.cart-item-details { flex:1; display:flex; flex-direction:column; }
+.cart-item-details h3 { font-size:1.1rem; margin-bottom:0.3rem; }
+.cart-item-details p { color:#FF6B81; font-weight:bold; font-size:1.05rem; margin:0; }
+.cart-item-qty input { width:60px; padding:0.5rem; border-radius:50px; border:1px solid #FF6B81; font-weight:bold; text-align:center; }
+.cart-item-remove { background:#FF6B81; color:#fff; border:none; padding:0.5rem 1rem; border-radius:50px; cursor:pointer; font-weight:bold; transition:background 0.3s; }
+.cart-item-remove:hover { background:#FF4757; }
+
+.checkout-area { flex:1; background:#fff8f5; border-radius:12px; padding:1rem; box-shadow:0 4px 10px rgba(0,0,0,0.1); display:flex; flex-direction:column; gap:1rem; }
+.checkout-area h2 { color:#FF6B81; margin-bottom:1rem; text-align:center; }
+
+.summary-line { display:flex; justify-content:space-between; font-weight:bold; color:#FF6B81; margin:0.5rem 0; }
+.summary-line.total { font-size:1.2rem; color:#FF4757; }
+
+.buyer-info { display:flex; flex-direction:column; gap:0.5rem; margin-bottom:1rem; }
+.buyer-info input { padding:0.5rem; border-radius:50px; border:1px solid #FF6B81; font-weight:bold; }
+
+.address-input { display:flex; flex-direction:column; gap:0.5rem; }
+.show-map-btn { background:#FF6B81; color:#fff; border:none; padding:0.5rem 1rem; border-radius:50px; cursor:pointer; font-weight:bold; transition:background 0.3s; }
+.show-map-btn:hover { background:#FF4757; }
+
+.payment-method label { display:flex; align-items:center; gap:0.5rem; padding:0.5rem 1rem; background:#fff; border-radius:50px; cursor:pointer; border:1px solid #FF6B81; font-weight:bold; }
+.payment-method input { accent-color:#FF6B81; }
+
+.payment-instructions { background:#fff; padding:1rem; border-radius:10px; border:1px solid #FF6B81; font-size:0.9rem; color:#4A3426; display:none; }
+.payment-instructions h3 { color:#FF6B81; margin-top:0; }
+
+.upload-section { margin-top:1rem; font-size:0.9rem; display:none; }
+
+.checkout-btn { background:#FF6B81; color:#fff; border:none; padding:0.8rem 1rem; border-radius:50px; font-weight:bold; cursor:pointer; transition:background 0.3s; margin-top:1rem; }
+.checkout-btn:hover { background:#FF4757; }
+
+.map-modal { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); justify-content:center; align-items:center; z-index:2000; }
+.map-modal-content { position:relative; width:90%; max-width:600px; height:400px; border-radius:12px; overflow:hidden; background:#fff; box-shadow:0 4px 10px rgba(0,0,0,0.3); display:flex; flex-direction:column; }
+.map-modal-content #modalMap { width:100%; height:100%; }
+.close-modal, .fullscreen-btn {
+  position:absolute; top:10px; background:#FF6B81; border:none; color:#fff; border-radius:50px; padding:0.6rem 1rem; cursor:pointer; font-weight:bold; z-index:9999; box-shadow:0 4px 8px rgba(0,0,0,0.3); transition: background 0.3s, transform 0.2s;
+}
+.close-modal:hover, .fullscreen-btn:hover { background:#FF4757; transform:scale(1.05); }
+.close-modal { right:10px; }
+.fullscreen-btn { left:10px; }
+.map-modal-content.fullscreen { width: 90% !important; max-width: 1200px; height: 70% !important; border-radius: 12px !important; }
+
+footer { background:#fff8f5; text-align:center; padding:1rem; font-weight:bold; color:#FF6B81; margin-top:2rem; }
+</style>
+</head>
+<body>
+
+<nav class="navbar">
+  <h1>Kira's Bloom Craft</h1>
+  <ul>
+    <li><a href="index.html">Home</a></li>
+    <li><a href="menu.html">Shop</a></li>
+    <li><a href="cart.html" class="active">Cart <span id="cartBadge">0</span></a></li>
+    <li><a href="reviews.html">Reviews</a></li>
+    <li><a href="about.html">About</a></li>
+    <li><a href="termsandcondition.html">Terms & Conditions</a></li>
+    <li><a href="tracking.html">Order Tracking</a></li>
+    <li><a href="customerservice.html">Customer Service</a></li>
+    <li><a href="#" id="logoutLink">Logout</a></li>
+  </ul>
+  <div class="nav-search"><input type="text" id="searchBar" placeholder="🔍 Search products..."></div>
+</nav>
+
+<main class="cart-main">
+  <div class="cart-items" id="cartList"><p>Your cart is empty.</p></div>
+
+  <aside class="checkout-area">
+    <h2>Order Summary</h2>
+
+    <div class="summary-line"><span>Subtotal</span><span id="subtotalVal">₱0.00</span></div>
+    <div class="summary-line"><span>Tax (12%)</span><span id="taxVal">₱0.00</span></div>
+    <div class="summary-line"><span>Delivery</span><span id="deliveryVal">₱50.00</span></div>
+    <div class="summary-line total"><span>Total</span><span id="totalVal">₱0.00</span></div>
+
+    <div class="buyer-info">
+      <label for="buyerName">🧑 Full Name</label>
+      <input type="text" id="buyerName" placeholder="Your full name">
+      <label for="buyerContact">📞 Contact Number</label>
+      <input type="text" id="buyerContact" placeholder="e.g. 09123456789">
+    </div>
+
+    <div class="address-input">
+      <label>📍 Delivery Location</label>
+      <button class="show-map-btn" id="showMapBtn">Select Delivery Location</button>
+    </div>
+
+    <div class="payment-method">
+      <label><input type="radio" name="payment" value="COD" checked> Cash on Delivery (COD)</label>
+      <label><input type="radio" name="payment" value="Gcash"> Gcash</label>
+    </div>
+
+    <div class="payment-instructions" id="gcashInstructions">
+      <h3>Payment Instructions</h3>
+      <p>Send payment to 09773255165 (Kimberly Moniño) or scan QR code below.</p>
+      <img src="images/gcash-qr.jpg" style="max-width:200px;border-radius:8px;box-shadow:0 2px 6px rgba(0,0,0,0.2);">
+      <p><em>Upload 2-5 receipt images below.</em></p>
+    </div>
+
+    <div class="upload-section" id="receiptUploadSection">
+      <label for="receiptUpload">Upload Receipt(s):</label>
+      <input type="file" id="receiptUpload" accept="image/*" multiple />
+    </div>
+
+    <button class="checkout-btn" onclick="placeOrder()">Place Order</button>
+  </aside>
+</main>
+
+<footer>&copy; 2025 Kira's Bloom Craft. All Rights Reserved.</footer>
+
+<div class="map-modal" id="mapModal">
+  <div class="map-modal-content">
+    <button class="close-modal" id="closeModalBtn">❌ Close</button>
+    <button class="fullscreen-btn" id="fullscreenBtn">⛶ Full Screen</button>
+    <div id="modalMap"></div>
+  </div>
+</div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+// CART LOGIC
+let cart = JSON.parse(localStorage.getItem("cart")) || [];
+let products = JSON.parse(localStorage.getItem("products")) || [];
+const cartList = document.getElementById("cartList");
+const cartBadge = document.getElementById("cartBadge");
+const subtotalVal = document.getElementById("subtotalVal");
+const taxVal = document.getElementById("taxVal");
+const deliveryVal = document.getElementById("deliveryVal");
+const totalVal = document.getElementById("totalVal");
+
+function updateCartBadge(){ cartBadge.textContent = cart.reduce((sum,item)=>sum+(item.qty||1),0); }
+
+function renderCart(){
+  cartList.innerHTML='';
+  if(cart.length===0){ 
+    cartList.innerHTML='<p>Your cart is empty.</p>'; 
+    subtotalVal.textContent='₱0.00';
+    taxVal.textContent='₱0.00';
+    totalVal.textContent='₱0.00';
+    return;
+  }
+  let subtotal=0;
+  cart.forEach((item,index)=>{
+    subtotal+=item.price*item.qty;
+    const div = document.createElement('div');
+    div.className='cart-item';
+    div.innerHTML = `
+      <img src="images/${item.img}" alt="${item.name}">
+      <div class="cart-item-details">
+        <h3>${item.name}</h3>
+        <p>₱${item.price.toFixed(2)}</p>
+      </div>
+      <div class="cart-item-qty"><input type="number" min="1" value="${item.qty}" data-index="${index}"></div>
+      <button class="cart-item-remove" data-index="${index}">Remove</button>
+    `;
+    cartList.appendChild(div);
+  });
+
+  const tax=subtotal*0.12;
+  const delivery=50;
+  const total=subtotal+tax+delivery;
+  subtotalVal.textContent=`₱${subtotal.toFixed(2)}`;
+  taxVal.textContent=`₱${tax.toFixed(2)}`;
+  totalVal.textContent=`₱${total.toFixed(2)}`;
+
+  document.querySelectorAll('.cart-item-qty input').forEach(input=>{
+    input.addEventListener('input', e=>{
+      const idx=e.target.dataset.index;
+      const prevQty = cart[idx].qty;
+      const newQty = Math.max(1,parseInt(e.target.value));
+      const prod = products.find(p=>p.id===cart[idx].id);
+      if(prod){
+        const diff = newQty - prevQty;
+        if(prod.inStock - diff < 0){
+          alert(`❌ Not enough stock for ${prod.name}`);
+          input.value = prevQty;
+          return;
+        }
+        prod.inStock -= diff;
+        localStorage.setItem('products',JSON.stringify(products));
+      }
+      cart[idx].qty = newQty;
+      localStorage.setItem('cart',JSON.stringify(cart));
+      renderCart();
+      updateCartBadge();
+    });
+  });
+
+  document.querySelectorAll('.cart-item-remove').forEach(btn=>{
+    btn.addEventListener('click', e=>{
+      const idx=e.target.dataset.index;
+      const removed = cart.splice(idx,1)[0];
+      const prod = products.find(p=>p.id===removed.id);
+      if(prod){ prod.inStock += removed.qty; localStorage.setItem('products',JSON.stringify(products)); }
+      localStorage.setItem('cart',JSON.stringify(cart));
+      renderCart();
+      updateCartBadge();
+    });
+  });
+}
+
+renderCart();
+updateCartBadge();
+
+// Payment toggle
+document.querySelectorAll('input[name="payment"]').forEach(radio=>{
+  radio.addEventListener('change', ()=>{
+    document.getElementById('gcashInstructions').style.display=(radio.value==='Gcash')?'block':'none';
+    document.getElementById('receiptUploadSection').style.display=(radio.value==='Gcash')?'block':'none';
+  });
+});
+
+// MAP MODAL
+const mapModal = document.getElementById('mapModal');
+const showMapBtn = document.getElementById('showMapBtn');
+const closeModalBtn = document.getElementById('closeModalBtn');
+const fullscreenBtn = document.getElementById('fullscreenBtn');
+let modalMap, pinMarker;
+
+showMapBtn.addEventListener('click', ()=>{
+  mapModal.style.display = 'flex';
+  if(!modalMap){
+    modalMap = L.map('modalMap').setView([10.3157,123.8854],13);
+    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",{ attribution:'&copy; OpenStreetMap contributors'}).addTo(modalMap);
+    const savedCoords = JSON.parse(localStorage.getItem('lastOrderCoords'));
+    if(savedCoords){
+      pinMarker = L.marker(savedCoords, {draggable:true}).addTo(modalMap)
+                  .bindPopup("📦 Delivery location").openPopup();
+      modalMap.setView(savedCoords,15);
+      pinMarker.on('dragend', e=>{
+        const {lat,lng} = e.target.getLatLng();
+        localStorage.setItem('lastOrderCoords', JSON.stringify([lat,lng]));
+      });
+    }
+
+    modalMap.on('click', function(e){
+      const {lat,lng} = e.latlng;
+      if(pinMarker) modalMap.removeLayer(pinMarker);
+      pinMarker = L.marker([lat,lng], {draggable:true}).addTo(modalMap)
+                  .bindPopup("📦 Delivery location").openPopup();
+      localStorage.setItem('lastOrderCoords', JSON.stringify([lat,lng]));
+
+      pinMarker.on('dragend', e=>{
+        const {lat,lng} = e.target.getLatLng();
+        localStorage.setItem('lastOrderCoords', JSON.stringify([lat,lng]));
+      });
+    });
+  }
+  modalMap.invalidateSize();
+});
+
+closeModalBtn.addEventListener('click', ()=>{ mapModal.style.display='none'; });
+fullscreenBtn.addEventListener('click', ()=>{
+  const modalContent = document.querySelector('.map-modal-content');
+  modalContent.classList.toggle('fullscreen');
+  modalMap.invalidateSize();
+});
+
+// PLACE ORDER
+function placeOrder(){
+  if(cart.length===0){ alert('Your cart is empty!'); return; }
+
+  const buyerName = document.getElementById('buyerName').value.trim();
+  const buyerContact = document.getElementById('buyerContact').value.trim();
+  if(!buyerName || !buyerContact){ alert('Please enter your full name and contact number.'); return; }
+
+  const coords = JSON.parse(localStorage.getItem('lastOrderCoords'));
+  if(!coords){ alert('Please select delivery location on map.'); return; }
+
+  let payment = document.querySelector('input[name="payment"]:checked').value;
+  let receiptsFiles = document.getElementById('receiptUpload').files;
+  if(payment==='Gcash' && (receiptsFiles.length<2 || receiptsFiles.length>5)){
+    alert('Please upload 2 to 5 receipt images for GCash.'); return;
+  }
+
+  const receipts = [];
+  if(receiptsFiles.length>0){
+    const readerPromises = Array.from(receiptsFiles).map(file=>{
+      return new Promise(resolve=>{
+        const reader = new FileReader();
+        reader.onload = e=>resolve(e.target.result);
+        reader.readAsDataURL(file);
+      });
+    });
+    Promise.all(readerPromises).then(base64Files=>{ placeOrderFinal(base64Files); });
+  } else { placeOrderFinal([]); }
+
+  function placeOrderFinal(receiptsArray){
+    cart.forEach(item=>{
+      const prod = products.find(p=>p.id===item.id);
+      if(prod){ prod.soldQty = (prod.soldQty||0)+item.qty; prod.inStock -= item.qty; }
+    });
+    localStorage.setItem('products',JSON.stringify(products));
+
+    let orders = JSON.parse(localStorage.getItem('orders')) || [];
+    const newOrder = {
+      id:'ORD'+Date.now(),
+      createdAt:new Date().toLocaleString(),
+      buyerName,
+      buyerContact,
+      items:cart,
+      payment,
+      subtotal:parseFloat(subtotalVal.textContent.replace('₱','')),
+      tax:parseFloat(taxVal.textContent.replace('₱','')),
+      delivery:parseFloat(deliveryVal.textContent.replace('₱','')),
+      total:parseFloat(totalVal.textContent.replace('₱','')),
+      coords,
+      receipts:receiptsArray,
+      status:'Order Confirmed'
+    };
+    orders.push(newOrder);
+    localStorage.setItem('orders',JSON.stringify(orders));
+    localStorage.setItem('lastOrderId', newOrder.id);
+
+    alert('✅ Order placed successfully! You can track it in Order Tracking.');
+
+    cart=[]; localStorage.setItem('cart',JSON.stringify(cart));
+    renderCart(); updateCartBadge();
+  }
+}
+
+// Logout
+document.getElementById("logoutLink").addEventListener("click",function(e){
+  e.preventDefault();
+  if(confirm("Are you sure you want to logout?")){
+    localStorage.clear();
+    window.location.href="login.html";
+  }
+});
+</script>
+</body>
+</html>

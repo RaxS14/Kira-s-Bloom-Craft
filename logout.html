@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Logging out — Kira's Bloom Craft</title>
+<style>
+  body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    font-family: 'Poppins', sans-serif;
+    background: #fff0f0;
+    color: #ff6b81;
+    text-align: center;
+    margin: 0;
+  }
+  h2 {
+    font-weight: normal;
+  }
+</style>
+</head>
+<body>
+  <h2>Logging you out...</h2>
+
+  <script>
+    // Clear all user-related data from localStorage
+    localStorage.removeItem('loggedInUser');
+    localStorage.removeItem('cart');
+    localStorage.removeItem('orders');
+    localStorage.removeItem('lastOrderId');
+
+    // Optional: clear everything if needed
+    // localStorage.clear();
+
+    // Redirect to login page after 0.5s
+    setTimeout(() => {
+      window.location.href = 'login.html';
+    }, 500);
+  </script>
+</body>
+</html>

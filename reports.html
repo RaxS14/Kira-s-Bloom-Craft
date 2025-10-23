@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Reports — Kira's BloomCraft</title>
+
+<!-- Fonts & Icons -->
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/remixicon/fonts/remixicon.css" rel="stylesheet">
+
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<!-- jsPDF -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Poppins', sans-serif; background: #fff8f5; color: #333; display: flex; height: 100vh; overflow: hidden; }
+.sidebar { width: 260px; background: #fff; border-right: 1px solid #ffd8c2; padding: 2rem 1rem; display: flex; flex-direction: column; align-items: center; box-shadow: 2px 0 15px rgba(255,140,105,0.1); }
+.sidebar img { width: 80px; height: 80px; border-radius: 50%; object-fit: cover; }
+.sidebar h2 { margin-top: 0.5rem; font-size: 1.3rem; color: #ff7043; }
+.sidebar p { font-size: 0.9rem; color: #999; margin-bottom: 2rem; }
+.sidebar .nav { list-style: none; width: 100%; }
+.sidebar .nav li { margin: 0.3rem 0; }
+.sidebar .nav a { display: flex; align-items: center; text-decoration: none; color: #333; padding: 0.7rem 1rem; border-radius: 10px; transition: all 0.3s ease; }
+.sidebar .nav a i { margin-right: 10px; font-size: 1.2rem; }
+.sidebar .nav a.active, .sidebar .nav a:hover { background: #ffe1d2; color: #ff7043; font-weight: 600; }
+main { flex: 1; overflow-y: auto; padding: 2rem; }
+header { background: linear-gradient(135deg, #FFCBA4, #FF9F7A); color: #fff; padding: 1rem 1.5rem; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); margin-bottom: 2rem; display: flex; justify-content: space-between; align-items: center; }
+header h1 { font-size: 1.5rem; }
+button.download-btn { background: #ff7043; color: #fff; border: none; padding: 0.6rem 1rem; border-radius: 8px; cursor: pointer; font-weight: 600; transition: all 0.3s ease; }
+button.download-btn:hover { background: #f4511e; }
+.card { border-radius: 20px; padding: 1.5rem; margin-bottom: 1.5rem; background: #fff; box-shadow: 0 10px 25px rgba(255, 159, 122, 0.15); }
+h2 { font-size: 1.3rem; margin-bottom: 1rem; color: #ff7043; border-bottom: 3px solid #FF8C69; display: inline-block; padding-bottom: 0.3rem; }
+.stats { display: flex; flex-wrap: wrap; gap: 1.5rem; }
+.stat-box { background: #fff; flex: 1 1 200px; padding: 1rem; border-radius: 15px; text-align: center; box-shadow: 0 5px 15px rgba(255, 159, 122, 0.15); }
+.stat-box h3 { font-size: 1rem; color: #ff7043; margin-bottom: 0.5rem; }
+.stat-box p { font-size: 1.4rem; font-weight: 700; }
+canvas { display: block; margin: 0 auto; max-width: 400px; height: auto !important; }
+table { width: 100%; border-collapse: collapse; margin-top: 1rem; }
+table th, table td { border: 1px solid #ffd8c2; padding: 0.6rem; text-align: left; }
+table th { background: #ffe1d2; color: #ff7043; }
+@media(max-width:768px){ body { flex-direction: column; } .sidebar { width: 100%; flex-direction: row; justify-content: space-around; padding: 1rem; } main { padding: 1rem; } }
+</style>
+</head>
+<body>
+
+<aside class="sidebar">
+  <img src="images/admin-avatar.png" alt="Admin Avatar">
+  <h2>Admin User</h2>
+  <p>Administrator</p>
+  <ul class="nav">
+    <li><a href="admin.html"><i class="ri-dashboard-line"></i> Dashboard</a></li>
+    <li><a href="inventory.html"><i class="ri-archive-2-line"></i> Inventory</a></li>
+    <li><a href="orders.html"><i class="ri-shopping-bag-3-line"></i> Orders</a></li>
+    <li><a href="suppliers.html"><i class="ri-truck-line"></i> Suppliers</a></li>
+    <li><a href="reports.html" class="active"><i class="ri-bar-chart-2-line"></i> Reports</a></li>
+    <li><a href="#" id="logoutLink"><i class="ri-logout-circle-line"></i> Logout</a></li>
+  </ul>
+</aside>
+
+<main>
+  <header>
+    <h1>Reports Overview</h1>
+    <button class="download-btn" id="downloadPDF">📄 Download PDF</button>
+  </header>
+
+  <div class="card">
+    <h2>Business Summary</h2>
+    <div class="stats">
+      <div class="stat-box"><h3>Total Orders</h3><p id="totalOrders">0</p></div>
+      <div class="stat-box"><h3>Delivered Orders</h3><p id="deliveredOrders">0</p></div>
+      <div class="stat-box"><h3>Cancelled Orders</h3><p id="cancelledOrders">0</p></div>
+      <div class="stat-box"><h3>Active Inventory Items</h3><p id="totalInventory">0</p></div>
+      <div class="stat-box"><h3>Total Items Sold</h3><p id="totalItemsSold">0</p></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>Order Status Breakdown</h2>
+    <canvas id="statusChart"></canvas>
+  </div>
+
+  <div class="card">
+    <h2>Top 5 Products in Stock</h2>
+    <canvas id="inventoryChart"></canvas>
+  </div>
+
+  <div class="card">
+    <h2>All Orders</h2>
+    <table id="ordersTable">
+      <thead>
+        <tr>
+          <th>Customer</th>
+          <th>Contact</th>
+          <th>Items</th>
+          <th>Status</th>
+          <th>Total</th>
+          <th>Date</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
+</main>
+
+<script>
+const totalOrdersEl = document.getElementById("totalOrders");
+const deliveredOrdersEl = document.getElementById("deliveredOrders");
+const cancelledOrdersEl = document.getElementById("cancelledOrders");
+const totalInventoryEl = document.getElementById("totalInventory");
+const totalItemsSoldEl = document.getElementById("totalItemsSold");
+const ordersTableBody = document.querySelector("#ordersTable tbody");
+let statusChart, inventoryChart;
+
+function getOrders() { return JSON.parse(localStorage.getItem("orders")) || []; }
+function getInventory() { return JSON.parse(localStorage.getItem("products")) || []; }
+
+function updateSummary(){
+  const orders = getOrders();
+  const inventory = getInventory();
+  totalOrdersEl.textContent = orders.length;
+  deliveredOrdersEl.textContent = orders.filter(o=>o.status==="Delivered").length;
+  cancelledOrdersEl.textContent = orders.filter(o=>o.status==="Cancelled").length;
+  totalInventoryEl.textContent = inventory.filter(p=>p.inStock>0).length;
+  totalItemsSoldEl.textContent = orders.reduce((sum,o)=>sum + (o.items||[]).reduce((s,i)=>s + (i.qty||1),0),0);
+}
+
+function renderStatusChart(){
+  const orders = getOrders();
+  const counts = {};
+  orders.forEach(o => { const s = o.status||"Pending"; counts[s]=(counts[s]||0)+1; });
+  if(statusChart) statusChart.destroy();
+  statusChart = new Chart(document.getElementById("statusChart"), {
+    type: 'doughnut',
+    data: { labels:Object.keys(counts), datasets:[{ data:Object.values(counts), backgroundColor:["#ffb74d","#42a5f5","#66bb6a","#ef5350","#ab47bc","#ff7043"] }] },
+    options: { responsive:true, plugins:{ legend:{ position:'bottom', labels:{boxWidth:12, padding:15} } } }
+  });
+}
+
+function renderInventoryChart(){
+  const top5 = getInventory().filter(p=>p.inStock>0).sort((a,b)=>b.inStock-a.inStock).slice(0,5);
+  if(inventoryChart) inventoryChart.destroy();
+  inventoryChart = new Chart(document.getElementById("inventoryChart"), {
+    type:'bar',
+    data:{ labels:top5.map(i=>i.name), datasets:[{ data:top5.map(i=>i.inStock), backgroundColor:'#ff9f7a' }] },
+    options:{ plugins:{legend:{display:false}}, scales:{y:{beginAtZero:true}} }
+  });
+}
+
+function renderOrdersTable(){
+  const orders = getOrders();
+  ordersTableBody.innerHTML = "";
+  orders.forEach(o=>{
+    const totalItems = (o.items||[]).reduce((s,i)=>s+(i.qty||1),0);
+    const orderTotal = (o.items||[]).reduce((sum,i)=>sum + (parseFloat(i.price)||0)*(parseInt(i.qty)||1),0);
+    const row = document.createElement("tr");
+    row.innerHTML = `<td>${o.buyerName||"Unknown"}</td>
+                     <td>${o.buyerContact||"—"}</td>
+                     <td>${totalItems} item(s) — ${(o.items||[]).map(i=>i.name).join(", ")}</td>
+                     <td>${o.status||"Pending"}</td>
+                     <td>₱${orderTotal.toFixed(2)}</td>
+                     <td>${o.createdAt ? new Date(o.createdAt).toLocaleDateString() : "—"}</td>`;
+    ordersTableBody.appendChild(row);
+  });
+}
+
+function renderReports(){ updateSummary(); renderStatusChart(); renderInventoryChart(); renderOrdersTable(); }
+renderReports(); setInterval(renderReports,2000);
+
+// PDF download
+document.getElementById("downloadPDF").addEventListener("click", () => {
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF('p','mm','a4');
+  const pageWidth = doc.internal.pageSize.getWidth();
+  const margin = 10;
+  const rowHeight = 8;
+
+  // Header
+  doc.setFontSize(16); doc.setFont('helvetica','bold');
+  doc.text("Kira's BloomCraft", pageWidth/2,12,{align:'center'});
+  doc.setFontSize(12); doc.setFont('helvetica','normal');
+  doc.text("Business Report", pageWidth/2,20,{align:'center'});
+  doc.setFontSize(10);
+  doc.text(`Generated: ${new Date().toLocaleString()}`, margin,28);
+
+  let y = 34;
+
+  // Columns
+  const headers = ["Customer","Contact","Items","Status","Total","Date"];
+  const colWidths = [40, 30, 30, 20, 25, 30];
+  const colX = [margin];
+  for(let i=1;i<headers.length;i++) colX.push(colX[i-1]+colWidths[i-1]);
+
+  // Draw header row
+  doc.setFont('helvetica','bold');
+  headers.forEach((h,i)=> doc.text(h, colX[i], y));
+  doc.setFont('helvetica','normal');
+  y += rowHeight;
+
+  const tableRows = document.querySelectorAll("#ordersTable tbody tr");
+
+  tableRows.forEach(row=>{
+    const cells = row.querySelectorAll("td");
+    const customer = cells[0].textContent;
+    const contact = cells[1].textContent;
+    const items = cells[2].textContent;
+    const statusText = cells[3].textContent;
+    const total = cells[4].textContent;
+    const date = cells[5].textContent;
+
+    // Convert status text to emoji
+    let statusEmoji = "⏳";
+    if(statusText.toLowerCase() === "delivered") statusEmoji = "✅";
+    else if(statusText.toLowerCase() === "cancelled") statusEmoji = "❌";
+
+    const data = [customer, contact, items, statusEmoji, total, date];
+
+    // Split text if needed
+    const lines = data.map((text, i) => doc.splitTextToSize(text, colWidths[i]));
+    const maxLines = Math.max(...lines.map(l=>l.length));
+
+    for(let i=0;i<maxLines;i++){
+      lines.forEach((line, j)=> {
+        doc.text(line[i] || "", colX[j], y);
+      });
+      y += rowHeight;
+    }
+
+    if(y>280){
+      doc.addPage();
+      y = 20;
+      doc.setFont('helvetica','bold');
+      headers.forEach((h,i)=> doc.text(h, colX[i], y));
+      doc.setFont('helvetica','normal');
+      y += rowHeight;
+    }
+  });
+
+  // Grand total
+  let grandTotal = 0;
+  tableRows.forEach(row=>{
+    const totalText = row.querySelectorAll("td")[4].textContent.replace("₱","") || "0";
+    grandTotal += parseFloat(totalText);
+  });
+
+  y += 4; doc.setFont('helvetica','bold');
+  doc.text(`Grand Total: ₱${grandTotal.toFixed(2)}`, pageWidth-margin, y, {align:'right'});
+
+  doc.save("KiraBloomCraft_Report.pdf");
+});
+</script>
+
+</body>
+</html>
