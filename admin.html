@@ -36,7 +36,6 @@ body {
 }
 .sidebar h2 { margin-top: 0.5rem; font-size: 1.3rem; color: #ff7043; }
 .sidebar p { font-size: 0.9rem; color: #999; margin-bottom: 2rem; }
-
 .sidebar .nav { list-style: none; width: 100%; }
 .sidebar .nav li { margin: 0.3rem 0; }
 .sidebar .nav a {
@@ -56,7 +55,6 @@ main {
   overflow-y: auto;
   padding: 2rem;
 }
-
 header {
   background: linear-gradient(135deg, #FFCBA4, #FF9F7A);
   color: #fff;
@@ -69,7 +67,6 @@ header {
   align-items: center;
 }
 header h1 { font-size: 1.5rem; }
-
 .refresh-indicator {
   font-size: 0.9rem;
   background: rgba(255,255,255,0.2);
@@ -80,8 +77,6 @@ header h1 { font-size: 1.5rem; }
 @keyframes pulse {
   0%,100% { opacity: 0.6; } 50% { opacity: 1; }
 }
-
-/* Orders Notification */
 #orderNotification {
   background: #FF7043;
   color: #fff;
@@ -100,7 +95,6 @@ h2 {
   font-size: 1.3rem; margin-bottom: 1rem; color: #ff7043;
   border-bottom: 3px solid #FF8C69; display: inline-block; padding-bottom: 0.3rem;
 }
-
 .card {
   border-radius: 20px;
   padding: 1.2rem;
@@ -108,14 +102,30 @@ h2 {
   background: #fff;
   box-shadow: 0 10px 25px rgba(255, 159, 122, 0.15);
   transition: 0.3s;
+  display: flex;
+  gap: 1rem;
+  align-items: flex-start;
 }
 .card:hover { transform: translateY(-4px); box-shadow: 0 15px 35px rgba(255, 140, 105, 0.25); }
-
-.order-card { border-left: 6px solid #FF8C69; background: linear-gradient(135deg, #FFF9F5, #FFF3E0); }
 .cs-card { border-left: 6px solid #42a5f5; background: linear-gradient(135deg, #E0F7FA, #B2EBF2); }
-
+.card img { width: 60px; height: 60px; border-radius: 50%; object-fit: cover; cursor:pointer; }
 .card h3 { margin-bottom: 0.5rem; font-weight: 700; }
-.items { margin: 0.5rem 0 1rem 1rem; }
+.card p { margin-bottom: 0.3rem; }
+.card select {
+  margin-top: 5px;
+  padding: 4px 6px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+}
+.card button {
+  margin-top: 5px;
+  padding: 4px 8px;
+  background: #ff7043;
+  border: none;
+  color: #fff;
+  border-radius: 6px;
+  cursor: pointer;
+}
 
 /* Lightbox */
 #lightbox {
@@ -128,6 +138,7 @@ h2 {
   body { flex-direction: column; }
   .sidebar { width: 100%; flex-direction: row; justify-content: space-around; padding: 1rem; }
   main { padding: 1rem; }
+  .card { flex-direction: column; align-items: center; text-align: center; }
 }
 </style>
 </head>
@@ -163,16 +174,17 @@ h2 {
   <div id="csContainer"></div>
 </main>
 
-<script>
-// Redirect to Orders page
-function goToOrders() {
-  window.location.href = "orders.html";
-}
+<!-- Lightbox for proof image -->
+<div id="lightbox"><img src="" alt="Proof Image"></div>
 
-// Wait for DOM to fully load
+<script>
+function goToOrders() { window.location.href = "orders.html"; }
+
 window.addEventListener('DOMContentLoaded', () => {
   const csContainer = document.getElementById("csContainer");
   const orderCountSpan = document.getElementById("orderCount");
+  const lightbox = document.getElementById("lightbox");
+  const lightboxImg = lightbox.querySelector("img");
 
   let csMessages = JSON.parse(localStorage.getItem("csMessages")) || [];
   let lastCS = JSON.stringify(csMessages);
@@ -182,14 +194,64 @@ window.addEventListener('DOMContentLoaded', () => {
       csContainer.innerHTML = "<p>No customer service messages.</p>";
       return;
     }
-    csContainer.innerHTML = csMessages.map(cs => `
+
+    csContainer.innerHTML = csMessages.map((cs, index) => `
       <div class="card cs-card">
-        <h3>${cs.name}</h3>
-        <p>${cs.message}</p>
-        <p><small>${cs.createdAt}</small></p>
+        <img src="${cs.proof || 'images/default-avatar.png'}" alt="${cs.name}" data-index="${index}">
+        <div>
+          <h3>${cs.name}</h3>
+          <p><strong>Email:</strong> ${cs.email}</p>
+          <p><strong>Order ID:</strong> ${cs.order || 'N/A'}</p>
+          <p><strong>Subject:</strong> ${cs.subject}</p>
+          <p><strong>Message:</strong> ${cs.message}</p>
+          ${cs.proof ? `<p><strong>Proof:</strong> <img src="${cs.proof}" style="max-width:150px; border-radius:6px; margin-top:5px; cursor:pointer;" data-index="${index}"></p>` : ''}
+          <p><small>Submitted: ${new Date(cs.timestamp).toLocaleString()}</small></p>
+          <label>Status:</label>
+          <select data-index="${index}">
+            <option value="Pending" ${cs.status === 'Pending' ? 'selected' : ''}>Pending</option>
+            <option value="In Progress" ${cs.status === 'In Progress' ? 'selected' : ''}>In Progress</option>
+            <option value="Resolved" ${cs.status === 'Resolved' ? 'selected' : ''}>Resolved</option>
+          </select>
+          <button data-index="${index}">Remove Ticket</button>
+        </div>
       </div>
     `).join("");
+
+    // Status change
+    csContainer.querySelectorAll("select").forEach(sel => {
+      sel.addEventListener("change", (e) => {
+        const idx = e.target.dataset.index;
+        csMessages[idx].status = e.target.value;
+        localStorage.setItem("csMessages", JSON.stringify(csMessages));
+      });
+    });
+
+    // Remove ticket
+    csContainer.querySelectorAll("button").forEach(btn => {
+      btn.addEventListener("click", (e) => {
+        const idx = e.target.dataset.index;
+        if(confirm("Are you sure you want to remove this ticket?")){
+          csMessages.splice(idx, 1);
+          localStorage.setItem("csMessages", JSON.stringify(csMessages));
+          renderCS();
+        }
+      });
+    });
+
+    // Lightbox click
+    csContainer.querySelectorAll("img").forEach(img => {
+      img.addEventListener("click", e => {
+        const idx = e.target.dataset.index;
+        if(csMessages[idx] && csMessages[idx].proof){
+          lightboxImg.src = csMessages[idx].proof;
+          lightbox.style.display = "flex";
+        }
+      });
+    });
   }
+
+  // Close lightbox
+  lightbox.addEventListener("click", () => { lightbox.style.display = "none"; });
 
   function updateOrderCount() {
     const orders = JSON.parse(localStorage.getItem("orders")) || [];
@@ -202,7 +264,7 @@ window.addEventListener('DOMContentLoaded', () => {
 
   // Live updates every second
   setInterval(() => {
-    const currentCS = JSON.stringify(JSON.parse(localStorage.getItem("csMessages")||"[]"));
+    const currentCS = JSON.stringify(JSON.parse(localStorage.getItem("csMessages") || "[]"));
     if(currentCS !== lastCS){
       lastCS = currentCS;
       csMessages = JSON.parse(currentCS);
@@ -210,8 +272,15 @@ window.addEventListener('DOMContentLoaded', () => {
     }
     updateOrderCount();
   }, 1000);
+
+  // Logout
+  const logoutLink = document.getElementById("logoutLink");
+  logoutLink.addEventListener("click", e => {
+    e.preventDefault();
+    localStorage.clear();
+    window.location.href = "login.html";
+  });
 });
 </script>
-
 </body>
 </html>
